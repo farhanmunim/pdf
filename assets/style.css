@@ -127,6 +127,9 @@ body {
 }
 
 .site-footer p { margin: 0; }
+.site-footer .footer-credit { margin-top: 0.25rem; }
+.site-footer a { color: var(--accent); font-weight: 600; text-decoration: none; }
+.site-footer a:hover { text-decoration: underline; }
 
 /* ---------- Shared tool UI ---------- */
 
