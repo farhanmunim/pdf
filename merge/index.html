@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PDF Merger — Merge PDF Files Online Free</title>
+  <meta name="description" content="Merge PDF files online for free. Combine multiple PDFs into one document directly in your browser — nothing is uploaded.">
+  <link rel="canonical" href="https://pdf.farhan.app/merge/">
+  <meta property="og:title" content="PDF Merger — Merge PDF Files Online Free">
+  <meta property="og:description" content="Combine multiple PDFs into one document directly in your browser. Original quality preserved, nothing uploaded.">
+  <meta property="og:url" content="https://pdf.farhan.app/merge/">
+  <meta property="og:type" content="website">
+  <link rel="stylesheet" href="/assets/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📄</text></svg>">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/">📄 PDF Tools</a>
+    <nav class="site-nav" aria-label="Tools">
+      <a href="/merge/" aria-current="page">Merge</a>
+      <a href="/edit/">Edit</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <h1 class="page-title">Merge PDFs</h1>
+    <p class="page-sub">Add files, arrange the order, then export a single PDF. Pages are copied as-is, so quality is unchanged.</p>
+
+    <button type="button" class="dropzone" id="dropzone">
+      <span class="dz-icon" aria-hidden="true">🗂️</span>
+      <p><strong>Choose PDF files</strong><br>or drag &amp; drop them here</p>
+    </button>
+    <input type="file" id="fileInput" class="visually-hidden" accept="application/pdf,.pdf" multiple aria-hidden="true" tabindex="-1">
+
+    <ul class="file-list" id="fileList" aria-label="Files to merge, in order"></ul>
+    <p class="status-line" id="listSummary"></p>
+
+    <div class="merge-actions">
+      <button type="button" class="btn btn-primary" id="mergeBtn" disabled>Merge PDFs</button>
+      <button type="button" class="btn" id="clearBtn" disabled>Clear all</button>
+    </div>
+
+    <p class="status-line" id="status" role="status" aria-live="polite"></p>
+  </main>
+
+  <footer class="site-footer">
+    <p>Files are processed locally on your device — nothing is uploaded.</p>
+  </footer>
+
+  <script src="/assets/vendor/pdf-lib-1.17.1.min.js"></script>
+  <script src="/assets/common.js"></script>
+  <script src="/assets/merge.js"></script>
+</body>
+</html>
