@@ -320,6 +320,54 @@ body {
 .tb-sep { width: 1px; align-self: stretch; background: var(--border); margin: 0 0.2rem; }
 .tb-spacer { flex: 1; }
 
+.font-browser {
+  position: sticky;
+  top: 0;
+  z-index: 45;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 0.75rem;
+  max-width: 480px;
+  margin: 0 auto;
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 0 0 10px 10px;
+  box-shadow: var(--shadow);
+}
+
+.fb-head { display: flex; gap: 0.4rem; }
+
+.fb-head input[type="search"] {
+  flex: 1;
+  font: inherit;
+  font-size: 0.95rem;
+  min-height: 2.4rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.fb-results { max-height: 40dvh; overflow-y: auto; margin-top: 0.4rem; }
+
+.fb-results button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  font-size: 0.95rem;
+  padding: 0.5rem 0.6rem;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.fb-results button:hover, .fb-results button:focus-visible { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+.fb-results .fb-note { color: var(--muted); font-size: 0.85rem; padding: 0.5rem 0.6rem; margin: 0; }
+
 .editor-stage {
   flex: 1;
   padding: 1rem 0.5rem 5rem;
@@ -375,6 +423,36 @@ body {
 }
 
 .tbox.selected { border-color: #1d4ed8; }
+
+.ibox {
+  position: absolute;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  border: 1px dashed transparent;
+  outline: none;
+}
+
+.ibox img { display: block; width: 100%; height: 100%; pointer-events: none; }
+.ibox.selected { border-color: #1d4ed8; }
+
+.ibox .resize-handle {
+  position: absolute;
+  right: -14px;
+  bottom: -14px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #1d4ed8;
+  border: 2px solid #fff;
+  cursor: nwse-resize;
+  touch-action: none;
+  display: none;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+.ibox.selected .resize-handle { display: block; }
 .tbox.editing {
   cursor: text;
   touch-action: auto;

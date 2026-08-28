@@ -45,15 +45,21 @@
     <!-- Editor state -->
     <section id="editor" hidden>
       <div class="editor-toolbar" role="toolbar" aria-label="Text formatting">
-        <button type="button" class="btn btn-compact btn-primary" id="addTextBtn">＋ Add text</button>
+        <button type="button" class="btn btn-compact btn-primary" id="addTextBtn">＋ Text</button>
+        <button type="button" class="btn btn-compact" id="addImageBtn">🖊 Signature</button>
+        <input type="file" id="imageInput" class="visually-hidden" accept="image/png,image/jpeg,image/svg+xml,image/webp" aria-hidden="true" tabindex="-1">
         <span class="tb-sep" aria-hidden="true"></span>
 
         <div class="tb-group">
           <label class="visually-hidden" for="fontSelect">Font</label>
           <select id="fontSelect">
-            <option value="Helvetica" selected>Helvetica</option>
-            <option value="Times">Times</option>
-            <option value="Courier">Courier</option>
+            <optgroup label="Standard">
+              <option value="Helvetica" selected>Helvetica</option>
+              <option value="Times">Times</option>
+              <option value="Courier">Courier</option>
+            </optgroup>
+            <optgroup label="Google Fonts" id="googleFontGroup" hidden></optgroup>
+            <option value="__browse">Browse Google Fonts…</option>
           </select>
 
           <label class="visually-hidden" for="sizeInput">Font size</label>
@@ -82,8 +88,17 @@
         <button type="button" class="btn btn-compact btn-primary" id="exportBtn">Export PDF</button>
       </div>
 
+      <div class="font-browser" id="fontBrowser" hidden>
+        <div class="fb-head">
+          <label class="visually-hidden" for="fontSearch">Search Google Fonts</label>
+          <input type="search" id="fontSearch" placeholder="Search 1,900+ Google Fonts…" autocomplete="off">
+          <button type="button" class="btn btn-compact" id="fontBrowserClose" aria-label="Close font search">✕</button>
+        </div>
+        <div class="fb-results" id="fontResults" role="listbox" aria-label="Font search results"></div>
+      </div>
+
       <div class="editor-stage" id="stage">
-        <p class="editor-hint" id="hint">Tap “＋ Add text”, then tap the page where the text should go. Drag text to move it; double-tap to edit it.</p>
+        <p class="editor-hint" id="hint">Tap “＋ Text”, then tap the page where the text should go. Drag to move; double-tap to edit.</p>
         <p class="status-line editor-hint" id="editStatus" role="status" aria-live="polite"></p>
         <div id="pages"></div>
       </div>
@@ -97,6 +112,7 @@
 
   <script src="/assets/vendor/pdfjs-3.11.174.min.js"></script>
   <script src="/assets/vendor/pdf-lib-1.17.1.min.js"></script>
+  <script src="/assets/vendor/fontkit-1.1.1.umd.min.js"></script>
   <script src="/assets/common.js"></script>
   <script src="/assets/edit.js"></script>
 </body>

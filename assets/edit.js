@@ -1,4 +1,5 @@
-/* PDF Editor — render with pdf.js, add/position text, export with pdf-lib. */
+/* PDF Editor — render with pdf.js; add text (standard or Google fonts) and
+   signature images; export with pdf-lib (text and images embedded natively). */
 "use strict";
 
 (() => {
@@ -7,7 +8,7 @@
   pdfjsLib.GlobalWorkerOptions.workerSrc = "/assets/vendor/pdfjs-worker-3.11.174.min.js";
 
   /* Screen font stacks and pdf-lib standard fonts for each family/style. */
-  const FONTS = {
+  const STD_FONTS = {
     Helvetica: {
       css: "Helvetica, Arial, sans-serif",
       std: { regular: "Helvetica", bold: "HelveticaBold", italic: "HelveticaOblique", boldItalic: "HelveticaBoldOblique" },
@@ -39,7 +40,10 @@
 
   // Toolbar
   const addTextBtn = document.getElementById("addTextBtn");
+  const addImageBtn = document.getElementById("addImageBtn");
+  const imageInput = document.getElementById("imageInput");
   const fontSelect = document.getElementById("fontSelect");
+  const googleFontGroup = document.getElementById("googleFontGroup");
   const sizeInput = document.getElementById("sizeInput");
   const colorInput = document.getElementById("colorInput");
   const boldBtn = document.getElementById("boldBtn");
@@ -49,14 +53,30 @@
   const resetBtn = document.getElementById("resetBtn");
   const exportBtn = document.getElementById("exportBtn");
 
+  // Font browser
+  const fontBrowser = document.getElementById("fontBrowser");
+  const fontSearch = document.getElementById("fontSearch");
+  const fontResults = document.getElementById("fontResults");
+  const fontBrowserClose = document.getElementById("fontBrowserClose");
+
   let pdfBytes = null; // original file bytes, used for export
   let pdfjsDoc = null;
   let pages = []; // per page: { wPt, hPt, scale, pageEl, overlayEl, canvas, rendered }
-  let boxes = []; // text elements: { id, page, xPt, yPt, text, font, bold, italic, size, color, align, el }
-  let nextBoxId = 1;
-  let selected = null; // box object or null
-  let placing = false;
+  /* Elements placed on pages. Text: { type:"text", page, xPt, yPt, text, font,
+     bold, italic, size, color, align, el }. Image: { type:"image", page, xPt,
+     yPt, wPt, hPt, asset, el }. Font is "Helvetica"/"Times"/"Courier" or
+     "g:Family Name" for a Google font. */
+  let boxes = [];
+  let selected = null;
+  let placing = null; // null | "text" | "image"
+  let pendingImage = null; // asset waiting to be placed
   let observer = null;
+
+  /* Google fonts: family -> variant availability flags (1=bold, 2=italic,
+     4=bold-italic; regular always present). Catalog loaded on demand. */
+  let fontCatalog = null; // Map(family -> flags)
+  let catalogPromise = null;
+  const loadedCss = new Set(); // families whose stylesheet is on the page
 
   /* Style applied to newly added text (updated as the user changes controls). */
   const current = { font: "Helvetica", size: 16, color: "#111111", bold: false, italic: false, align: "left" };
@@ -159,27 +179,184 @@
     }
   }
 
-  /* ---------- Text boxes ---------- */
+  /* ---------- Google fonts ---------- */
+
+  function isGoogleFont(name) { return name.startsWith("g:"); }
+  function familyOf(name) { return name.slice(2); }
+
+  async function loadCatalog() {
+    if (fontCatalog) return fontCatalog;
+    if (!catalogPromise) {
+      catalogPromise = fetch("/assets/google-fonts.json")
+        .then((r) => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+        .then((list) => { fontCatalog = new Map(list); return fontCatalog; });
+    }
+    return catalogPromise;
+  }
+
+  /* Which of the four variants this box can actually use (regular always exists). */
+  function effectiveStyle(box) {
+    if (!isGoogleFont(box.font)) return { bold: box.bold, italic: box.italic };
+    const flags = fontCatalog ? fontCatalog.get(familyOf(box.font)) : 0;
+    let bold = box.bold, italic = box.italic;
+    if (bold && italic && !(flags & 4)) {
+      if (flags & 1) italic = false;
+      else if (flags & 2) bold = false;
+      else { bold = false; italic = false; }
+    } else if (bold && !italic && !(flags & 1)) bold = false;
+    else if (italic && !bold && !(flags & 2)) italic = false;
+    return { bold, italic };
+  }
+
+  function css2Url(family, { withVariants = false, bold = false, italic = false, text = "" } = {}) {
+    const fam = family.replace(/ /g, "+");
+    let spec = fam;
+    if (withVariants) {
+      const flags = fontCatalog.get(family) || 0;
+      const tuples = ["0,400"];
+      if (flags & 1) tuples.push("0,700");
+      if (flags & 2) tuples.push("1,400");
+      if (flags & 4) tuples.push("1,700");
+      if (tuples.length > 1) spec += ":ital,wght@" + tuples.join(";");
+    } else if (bold && italic) spec += ":ital,wght@1,700";
+    else if (bold) spec += ":wght@700";
+    else if (italic) spec += ":ital@1";
+    let url = `https://fonts.googleapis.com/css2?family=${spec}&display=swap`;
+    if (text) url += `&text=${encodeURIComponent(text)}`;
+    return url;
+  }
+
+  /* Put the family's stylesheet on the page so previews render in the real font. */
+  function ensureCssLoaded(family) {
+    if (loadedCss.has(family)) return;
+    loadedCss.add(family);
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = css2Url(family, { withVariants: true });
+    document.head.appendChild(link);
+  }
+
+  function addFamilyToSelect(family) {
+    const value = "g:" + family;
+    if (fontSelect.querySelector(`option[value="${CSS.escape(value)}"]`)) return;
+    const opt = document.createElement("option");
+    opt.value = value;
+    opt.textContent = family;
+    googleFontGroup.appendChild(opt);
+    googleFontGroup.hidden = false;
+  }
+
+  function useGoogleFont(family) {
+    ensureCssLoaded(family);
+    addFamilyToSelect(family);
+    updateStyle({ font: "g:" + family });
+  }
+
+  /* ---------- Font browser panel ---------- */
+
+  let lastFontValue = current.font;
+
+  function openFontBrowser() {
+    fontBrowser.hidden = false;
+    fontSearch.value = "";
+    renderFontResults("");
+    fontSearch.focus();
+    loadCatalog().then(() => renderFontResults(fontSearch.value)).catch(() => {
+      fontResults.innerHTML = "";
+      const p = document.createElement("p");
+      p.className = "fb-note";
+      p.textContent = "Couldn’t load the font list. Check your connection and try again.";
+      fontResults.appendChild(p);
+    });
+  }
+
+  function closeFontBrowser() {
+    fontBrowser.hidden = true;
+    syncToolbar();
+  }
+
+  function renderFontResults(query) {
+    fontResults.textContent = "";
+    if (!fontCatalog) {
+      const p = document.createElement("p");
+      p.className = "fb-note";
+      p.textContent = "Loading font list…";
+      fontResults.appendChild(p);
+      return;
+    }
+    const q = query.trim().toLowerCase();
+    let shown = 0;
+    for (const family of fontCatalog.keys()) {
+      if (q && !family.toLowerCase().includes(q)) continue;
+      const b = document.createElement("button");
+      b.type = "button";
+      b.setAttribute("role", "option");
+      b.textContent = family;
+      b.addEventListener("click", () => {
+        useGoogleFont(family);
+        closeFontBrowser();
+      });
+      fontResults.appendChild(b);
+      if (++shown >= 60) break;
+    }
+    if (!shown) {
+      const p = document.createElement("p");
+      p.className = "fb-note";
+      p.textContent = "No fonts match that search.";
+      fontResults.appendChild(p);
+    }
+  }
+
+  fontSearch.addEventListener("input", () => renderFontResults(fontSearch.value));
+  fontSearch.addEventListener("keydown", (e) => { if (e.key === "Escape") closeFontBrowser(); });
+  fontBrowserClose.addEventListener("click", closeFontBrowser);
+
+  /* ---------- Placement ---------- */
 
   function onOverlayPointerDown(e, pageIndex) {
-    if (e.target !== e.currentTarget) return; // a text box handles its own events
-    if (placing) {
+    if (e.target !== e.currentTarget) return; // boxes handle their own events
+    if (placing === "text") {
       e.preventDefault();
-      const rect = e.currentTarget.getBoundingClientRect();
-      const info = pages[pageIndex];
-      const xPt = (e.clientX - rect.left) / info.scale;
-      const yPt = (e.clientY - rect.top) / info.scale;
-      addBox(pageIndex, xPt, yPt);
-      setPlacing(false);
+      const { xPt, yPt } = overlayPoint(e, pageIndex);
+      addTextBox(pageIndex, xPt, yPt);
+      setPlacing(null);
+    } else if (placing === "image" && pendingImage) {
+      e.preventDefault();
+      const { xPt, yPt } = overlayPoint(e, pageIndex);
+      addImageBox(pageIndex, xPt, yPt, pendingImage);
+      pendingImage = null;
+      setPlacing(null);
     } else {
       select(null);
     }
   }
 
-  function addBox(pageIndex, xPt, yPt) {
+  function overlayPoint(e, pageIndex) {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const info = pages[pageIndex];
+    return { xPt: (e.clientX - rect.left) / info.scale, yPt: (e.clientY - rect.top) / info.scale };
+  }
+
+  function setPlacing(mode) {
+    placing = mode;
+    if (mode !== "image") pendingImage = null;
+    stage.classList.toggle("placing", !!mode);
+    addTextBtn.classList.toggle("toggled", mode === "text");
+    addTextBtn.setAttribute("aria-pressed", String(mode === "text"));
+    addImageBtn.classList.toggle("toggled", mode === "image");
+    addImageBtn.setAttribute("aria-pressed", String(mode === "image"));
+    hintEl.textContent =
+      mode === "text" ? "Now tap or click the spot on the page where the text should go."
+      : mode === "image" ? "Now tap or click the spot on the page where the signature should go."
+      : "Tap “＋ Text”, then tap the page where the text should go. Drag to move; double-tap to edit.";
+  }
+
+  /* ---------- Text boxes ---------- */
+
+  function addTextBox(pageIndex, xPt, yPt) {
     const info = pages[pageIndex];
     const box = {
-      id: nextBoxId++,
+      type: "text",
       page: pageIndex,
       xPt: clamp(xPt, 0, info.wPt - 10),
       yPt: clamp(yPt, 0, info.hPt - current.size),
@@ -217,10 +394,16 @@
     const s = box.el.style;
     s.left = box.xPt * info.scale + "px";
     s.top = box.yPt * info.scale + "px";
+    if (box.type === "image") {
+      s.width = box.wPt * info.scale + "px";
+      s.height = box.hPt * info.scale + "px";
+      return;
+    }
+    const eff = effectiveStyle(box);
     s.fontSize = box.size * info.scale + "px";
-    s.fontFamily = FONTS[box.font].css;
-    s.fontWeight = box.bold ? "bold" : "normal";
-    s.fontStyle = box.italic ? "italic" : "normal";
+    s.fontFamily = isGoogleFont(box.font) ? `"${familyOf(box.font)}", sans-serif` : STD_FONTS[box.font].css;
+    s.fontWeight = eff.bold ? "700" : "400";
+    s.fontStyle = eff.italic ? "italic" : "normal";
     s.color = box.color;
     s.textAlign = box.align;
   }
@@ -231,14 +414,17 @@
     deleteBtn.disabled = !box;
     if (!box) return;
     box.el.classList.add("selected");
-    // Reflect the selected box's style in the toolbar.
-    current.font = box.font; current.size = box.size; current.color = box.color;
-    current.bold = box.bold; current.italic = box.italic; current.align = box.align;
-    syncToolbar();
+    if (box.type === "text") {
+      // Reflect the selected box's style in the toolbar.
+      current.font = box.font; current.size = box.size; current.color = box.color;
+      current.bold = box.bold; current.italic = box.italic; current.align = box.align;
+      syncToolbar();
+    }
   }
 
   function syncToolbar() {
     fontSelect.value = current.font;
+    lastFontValue = current.font;
     sizeInput.value = current.size;
     colorInput.value = current.color;
     boldBtn.classList.toggle("toggled", current.bold);
@@ -260,7 +446,7 @@
 
   /* Dragging: pointer capture on the box; a small threshold distinguishes tap from drag. */
   function onBoxPointerDown(e, box) {
-    if (box.el.classList.contains("editing")) return;
+    if (box.type === "text" && box.el.classList.contains("editing")) return;
     e.preventDefault();
     e.stopPropagation();
     select(box);
@@ -293,7 +479,7 @@
   }
 
   function onBoxKeyDown(e, box) {
-    if (box.el.classList.contains("editing")) {
+    if (box.type === "text" && box.el.classList.contains("editing")) {
       if (e.key === "Escape") { e.preventDefault(); box.el.blur(); }
       return;
     }
@@ -304,7 +490,7 @@
       case "ArrowRight": box.xPt = clamp(box.xPt + step, 0, info.wPt - 4); break;
       case "ArrowUp": box.yPt = clamp(box.yPt - step, 0, info.hPt - 4); break;
       case "ArrowDown": box.yPt = clamp(box.yPt + step, 0, info.hPt - 4); break;
-      case "Enter": e.preventDefault(); startEditing(box); return;
+      case "Enter": if (box.type === "text") { e.preventDefault(); startEditing(box); } return;
       case "Delete":
       case "Backspace": e.preventDefault(); removeBox(box); return;
       default: return;
@@ -338,30 +524,166 @@
     if (!box.text.trim()) removeBox(box);
   }
 
-  function setPlacing(on) {
-    placing = on;
-    stage.classList.toggle("placing", on);
-    addTextBtn.classList.toggle("toggled", on);
-    addTextBtn.setAttribute("aria-pressed", String(on));
-    hintEl.textContent = on
-      ? "Now tap or click the spot on the page where the text should go."
-      : "Tap “＋ Add text”, then tap the page where the text should go. Drag text to move it; double-tap to edit it.";
+  /* ---------- Signature / image boxes ---------- */
+
+  addImageBtn.addEventListener("click", () => {
+    if (placing === "image") { setPlacing(null); return; }
+    imageInput.click();
+  });
+
+  imageInput.addEventListener("change", async () => {
+    const file = imageInput.files[0];
+    imageInput.value = "";
+    if (!file) return;
+    editStatus.busy("Preparing image…");
+    try {
+      pendingImage = await prepareImage(file);
+      editStatus.clear();
+      setPlacing("image");
+    } catch (err) {
+      editStatus.error(`“${file.name}” couldn’t be read as an image. ${String((err && err.message) || err)}`);
+    }
+  });
+
+  /* Normalise an uploaded image to bytes pdf-lib can embed.
+     PNG/JPEG are kept byte-for-byte (lossless). SVG/WebP are rasterised to
+     PNG at high resolution with transparency preserved. */
+  async function prepareImage(file) {
+    const okTypes = ["image/png", "image/jpeg", "image/svg+xml", "image/webp"];
+    const type = file.type || (/\.svg$/i.test(file.name) ? "image/svg+xml" : "");
+    if (!okTypes.includes(type)) throw new Error("Please use a PNG, JPEG, SVG or WebP file.");
+
+    const url = URL.createObjectURL(file);
+    try {
+      const img = await new Promise((resolve, reject) => {
+        const im = new Image();
+        im.onload = () => resolve(im);
+        im.onerror = () => reject(new Error("The image could not be decoded."));
+        im.src = url;
+      });
+      const natW = img.naturalWidth || 300;
+      const natH = img.naturalHeight || 150;
+
+      if (type === "image/png" || type === "image/jpeg") {
+        return {
+          kind: type === "image/png" ? "png" : "jpg",
+          bytes: new Uint8Array(await file.arrayBuffer()),
+          displayUrl: URL.createObjectURL(file),
+          aspect: natW / natH,
+        };
+      }
+
+      // Rasterise SVG/WebP to PNG on a transparent canvas.
+      const targetW = Math.min(Math.max(natW, 600), 2000);
+      const targetH = Math.round(targetW * (natH / natW));
+      const canvas = document.createElement("canvas");
+      canvas.width = targetW;
+      canvas.height = targetH;
+      canvas.getContext("2d").drawImage(img, 0, 0, targetW, targetH);
+      const blob = await new Promise((resolve, reject) =>
+        canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("Rasterising failed."))), "image/png"));
+      return {
+        kind: "png",
+        bytes: new Uint8Array(await blob.arrayBuffer()),
+        displayUrl: canvas.toDataURL("image/png"),
+        aspect: targetW / targetH,
+      };
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+  }
+
+  function addImageBox(pageIndex, xPt, yPt, asset) {
+    const info = pages[pageIndex];
+    const wPt = Math.min(info.wPt * 0.3, 250);
+    const hPt = wPt / asset.aspect;
+    const box = {
+      type: "image",
+      page: pageIndex,
+      xPt: clamp(xPt - wPt / 2, 0, info.wPt - wPt),
+      yPt: clamp(yPt - hPt / 2, 0, Math.max(0, info.hPt - hPt)),
+      wPt,
+      hPt,
+      asset,
+      el: null,
+    };
+    const el = document.createElement("div");
+    el.className = "ibox";
+    el.setAttribute("role", "img");
+    el.setAttribute("aria-label", "Signature image — arrow keys to move, Delete to remove");
+    el.tabIndex = 0;
+    const img = document.createElement("img");
+    img.src = asset.displayUrl;
+    img.alt = "";
+    const handle = document.createElement("div");
+    handle.className = "resize-handle";
+    handle.setAttribute("aria-hidden", "true");
+    el.append(img, handle);
+    box.el = el;
+    el.addEventListener("pointerdown", (e) => {
+      if (e.target === handle) return;
+      onBoxPointerDown(e, box);
+    });
+    handle.addEventListener("pointerdown", (e) => startResize(e, box, handle));
+    el.addEventListener("keydown", (e) => onBoxKeyDown(e, box));
+    el.addEventListener("focus", () => { if (selected !== box) select(box); });
+    info.overlayEl.appendChild(el);
+    boxes.push(box);
+    applyBoxStyle(box);
+    select(box);
+    el.focus({ preventScroll: true });
+    return box;
+  }
+
+  /* Corner-handle resize, aspect ratio locked. */
+  function startResize(e, box, handle) {
+    e.preventDefault();
+    e.stopPropagation();
+    select(box);
+    const info = pages[box.page];
+    const startX = e.clientX;
+    const origW = box.wPt;
+    handle.setPointerCapture(e.pointerId);
+
+    const onMove = (ev) => {
+      const dw = (ev.clientX - startX) / info.scale;
+      const maxW = Math.min(info.wPt - box.xPt, (info.hPt - box.yPt) * box.asset.aspect);
+      box.wPt = clamp(origW + dw, 12, Math.max(12, maxW));
+      box.hPt = box.wPt / box.asset.aspect;
+      applyBoxStyle(box);
+    };
+    const onUp = () => {
+      handle.removeEventListener("pointermove", onMove);
+      handle.removeEventListener("pointerup", onUp);
+      handle.removeEventListener("pointercancel", onUp);
+    };
+    handle.addEventListener("pointermove", onMove);
+    handle.addEventListener("pointerup", onUp);
+    handle.addEventListener("pointercancel", onUp);
   }
 
   /* ---------- Toolbar events ---------- */
 
-  addTextBtn.addEventListener("click", () => setPlacing(!placing));
+  addTextBtn.addEventListener("click", () => setPlacing(placing === "text" ? null : "text"));
 
   function updateStyle(patch) {
     Object.assign(current, patch);
     syncToolbar();
-    if (selected) {
+    if (selected && selected.type === "text") {
       Object.assign(selected, patch);
       applyBoxStyle(selected);
     }
   }
 
-  fontSelect.addEventListener("change", () => updateStyle({ font: fontSelect.value }));
+  fontSelect.addEventListener("change", () => {
+    if (fontSelect.value === "__browse") {
+      fontSelect.value = lastFontValue; // keep the current font while browsing
+      openFontBrowser();
+      return;
+    }
+    if (isGoogleFont(fontSelect.value)) ensureCssLoaded(familyOf(fontSelect.value));
+    updateStyle({ font: fontSelect.value });
+  });
   sizeInput.addEventListener("change", () => {
     const size = clamp(Number(sizeInput.value) || 16, 6, 144);
     sizeInput.value = size;
@@ -374,7 +696,7 @@
   deleteBtn.addEventListener("click", () => { if (selected) removeBox(selected); });
 
   resetBtn.addEventListener("click", () => {
-    if (boxes.length && !confirm("Close this PDF? Text you added will be discarded.")) return;
+    if (boxes.length && !confirm("Close this PDF? Everything you added will be discarded.")) return;
     resetEditor();
   });
 
@@ -385,7 +707,7 @@
     pages = [];
     boxes = [];
     selected = null;
-    setPlacing(false);
+    setPlacing(null);
     pagesEl.textContent = "";
     editStatus.clear();
     editor.hidden = true;
@@ -395,12 +717,6 @@
 
   /* ---------- Export ---------- */
 
-  function stdFontFor(box) {
-    const variants = FONTS[box.font].std;
-    const key = box.bold && box.italic ? "boldItalic" : box.bold ? "bold" : box.italic ? "italic" : "regular";
-    return PDFLib.StandardFonts[variants[key]];
-  }
-
   function hexToRgb(hex) {
     return PDFLib.rgb(
       parseInt(hex.slice(1, 3), 16) / 255,
@@ -409,7 +725,7 @@
     );
   }
 
-  /* Standard PDF fonts can only encode WinAnsi characters; drop anything else. */
+  /* Drop characters the chosen font cannot encode. */
   function encodableText(font, text) {
     let out = "";
     let dropped = false;
@@ -424,35 +740,74 @@
     return { text: out, dropped };
   }
 
+  /* Download the exact glyphs needed for one Google font variant.
+     Google's css2 endpoint with `text=` returns a single @font-face whose
+     file covers exactly those characters. */
+  async function fetchGoogleFontBytes(family, eff, text) {
+    const cssUrl = css2Url(family, { bold: eff.bold, italic: eff.italic, text });
+    const cssRes = await fetch(cssUrl);
+    if (!cssRes.ok) throw new Error(`Google Fonts request for “${family}” failed (HTTP ${cssRes.status}).`);
+    const css = await cssRes.text();
+    const m = css.match(/src:\s*url\((https:[^)]+)\)/);
+    if (!m) throw new Error(`No downloadable file found for “${family}”.`);
+    const fontRes = await fetch(m[1]);
+    if (!fontRes.ok) throw new Error(`Downloading “${family}” failed (HTTP ${fontRes.status}).`);
+    return new Uint8Array(await fontRes.arrayBuffer());
+  }
+
   exportBtn.addEventListener("click", async () => {
     if (!pdfBytes) return;
     // Commit any in-progress edit first.
-    if (selected && selected.el.classList.contains("editing")) selected.el.blur();
+    if (selected && selected.type === "text" && selected.el.classList.contains("editing")) selected.el.blur();
 
     exportBtn.disabled = true;
     editStatus.busy("Exporting PDF…");
     try {
+      const textBoxes = boxes.filter((b) => b.type === "text" && b.text.trim());
+      const imageBoxes = boxes.filter((b) => b.type === "image");
+      const needsCatalog = textBoxes.some((b) => isGoogleFont(b.font));
+      if (needsCatalog) await loadCatalog();
+
       const doc = await PDFLib.PDFDocument.load(pdfBytes);
+      if (needsCatalog) doc.registerFontkit(fontkit);
+      const pdfPages = doc.getPages();
+
+      /* Embed each needed font once. Standard fonts key on the pdf-lib name;
+         Google fonts key on family+variant and are fetched subset to the
+         exact characters used, then embedded. */
       const fontCache = new Map();
-      const embed = async (name) => {
-        if (!fontCache.has(name)) fontCache.set(name, await doc.embedFont(name));
-        return fontCache.get(name);
+      const fontFor = async (box) => {
+        const eff = effectiveStyle(box);
+        if (!isGoogleFont(box.font)) {
+          const variants = STD_FONTS[box.font].std;
+          const name = variants[eff.bold && eff.italic ? "boldItalic" : eff.bold ? "bold" : eff.italic ? "italic" : "regular"];
+          if (!fontCache.has(name)) fontCache.set(name, doc.embedFont(PDFLib.StandardFonts[name]));
+          return fontCache.get(name);
+        }
+        const family = familyOf(box.font);
+        const key = `g|${family}|${eff.bold ? 1 : 0}${eff.italic ? 1 : 0}`;
+        if (!fontCache.has(key)) {
+          const chars = textBoxes
+            .filter((b) => isGoogleFont(b.font) && familyOf(b.font) === family &&
+              effectiveStyle(b).bold === eff.bold && effectiveStyle(b).italic === eff.italic)
+            .map((b) => b.text).join("");
+          const uniq = Array.from(new Set(chars.replace(/\n/g, ""))).join("");
+          fontCache.set(key, fetchGoogleFontBytes(family, eff, uniq)
+            .then((bytes) => doc.embedFont(bytes, { subset: true })));
+        }
+        return fontCache.get(key);
       };
 
       let droppedChars = false;
-      const pdfPages = doc.getPages();
-
-      for (const box of boxes) {
-        if (!box.text.trim()) continue;
+      for (const box of textBoxes) {
         const page = pdfPages[box.page];
         const info = pages[box.page];
-        const font = await embed(stdFontFor(box));
+        const font = await fontFor(box);
         const size = box.size;
         const color = hexToRgb(box.color);
         const leading = size * LINE_HEIGHT;
 
-        const rawLines = box.text.split("\n");
-        const lines = rawLines.map((l) => {
+        const lines = box.text.split("\n").map((l) => {
           const r = encodableText(font, l);
           if (r.dropped) droppedChars = true;
           return r.text;
@@ -483,10 +838,28 @@
         });
       }
 
+      /* Embed each distinct image asset once, then place it per box. */
+      const imageCache = new Map();
+      for (const box of imageBoxes) {
+        if (!imageCache.has(box.asset)) {
+          imageCache.set(box.asset, box.asset.kind === "png"
+            ? doc.embedPng(box.asset.bytes)
+            : doc.embedJpg(box.asset.bytes));
+        }
+        const image = await imageCache.get(box.asset);
+        const info = pages[box.page];
+        pdfPages[box.page].drawImage(image, {
+          x: box.xPt,
+          y: info.hPt - box.yPt - box.hPt,
+          width: box.wPt,
+          height: box.hPt,
+        });
+      }
+
       const bytes = await doc.save();
       downloadBlob(bytes, "edited.pdf");
       editStatus.info(droppedChars
-        ? "Done — edited.pdf downloaded. Note: some special characters aren’t supported by the built-in PDF fonts and were left out."
+        ? "Done — edited.pdf downloaded. Note: some characters aren’t available in the chosen font and were left out."
         : "Done — edited.pdf has been downloaded.");
     } catch (err) {
       editStatus.error("Export failed. " + describePdfError(err));
@@ -495,7 +868,7 @@
     }
   });
 
-  /* ---------- Resize: re-scale pages and reposition text ---------- */
+  /* ---------- Resize: re-scale pages and reposition boxes ---------- */
 
   let resizeTimer = null;
   let lastWidth = window.innerWidth;
