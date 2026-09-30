@@ -88,7 +88,9 @@ mobile nav, `sitemap.xml` and the changelog. No other changes needed.
 
 ## Releasing
 
-Bump the version pill in each page's topbar, add an entry to
+Bump the version pill in each page's topbar **and the `?v=` query on the
+`style.css` / `common.js` / tool script references** (so browsers never pair
+new HTML with a cached old stylesheet or script), add an entry to
 `changelog/index.html` and update `lastmod` in `sitemap.xml`.
 
 ## Development
