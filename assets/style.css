@@ -697,6 +697,7 @@ input[type="color"].input::-moz-color-swatch { border: 1px solid var(--border-c)
 
 .merge-actions { display: flex; flex-wrap: wrap; gap: var(--sp-3); margin-top: var(--sp-6); }
 .merge-actions .btn { min-width: 120px; }
+.action-row { display: flex; flex-wrap: wrap; gap: var(--sp-3); }
 
 /* ── Editor ────────────────────────────────────────────── */
 .editor { flex: 1; display: flex; flex-direction: column; min-height: 0; }

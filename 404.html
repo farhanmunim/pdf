@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Page not found — PDF Tools</title>
+  <meta name="description" content="That page doesn’t exist. Head back to PDF Tools to merge or edit PDFs privately in your browser.">
+  <meta name="robots" content="noindex, follow">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="/assets/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="stylesheet" href="/assets/style.css">
+  <script>
+    // Apply the stored theme before first paint to avoid a flash.
+    (function () {
+      try {
+        var t = localStorage.getItem("app-theme");
+        if (t === "dark" || t === "light") document.documentElement.setAttribute("data-theme", t);
+        var dark = t ? t === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+        var m = document.querySelector('meta[name="theme-color"]');
+        if (m) m.setAttribute("content", dark ? "#09090b" : "#ffffff");
+      } catch (_) {}
+    })();
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="topbar">
+    <a href="/" class="topbar-logo">
+      <span class="logo-mark" aria-hidden="true">
+        <svg class="icon" viewBox="0 0 24 24" focusable="false"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+      </span>
+      <span>PDF Tools</span>
+    </a>
+    <a href="/changelog/" class="version-pill">v1.2.0<span class="visually-hidden"> — view changelog</span></a>
+
+    <div class="topbar-spacer"></div>
+
+    <nav class="topbar-nav" aria-label="Tools">
+      <a class="btn btn-ghost btn-sm" href="/merge/">Merge</a>
+      <a class="btn btn-ghost btn-sm" href="/edit/">Edit</a>
+    </nav>
+    <span class="topbar-divider" aria-hidden="true"></span>
+    <button type="button" class="btn btn-ghost btn-icon btn-sm" data-theme-toggle aria-label="Switch to dark theme">
+      <svg class="icon icon-sm theme-icon-light" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+      <svg class="icon icon-sm theme-icon-dark" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+    </button>
+  </header>
+
+  <main id="main" class="main" tabindex="-1">
+    <div class="canvas-area">
+      <div class="page page-narrow">
+        <header class="page-header">
+          <p class="eyebrow">Error 404</p>
+          <h1 class="page-title">Page not found</h1>
+          <p class="page-sub">The page you asked for doesn’t exist or may have moved. The tools are still one click away.</p>
+        </header>
+        <div class="canvas">
+          <div class="canvas-section action-row">
+            <a class="btn btn-primary" href="/">Go to the homepage</a>
+            <a class="btn btn-outline" href="/merge/">Merge PDFs</a>
+            <a class="btn btn-outline" href="/edit/">Edit a PDF</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="app-footer">
+    <button type="button" class="app-footer__link" data-dialog-open="aboutDialog">About</button>
+    <span class="footer-sep" aria-hidden="true"></span>
+    <a href="/changelog/">Changelog</a>
+    <span class="footer-sep" aria-hidden="true"></span>
+    <button type="button" class="app-footer__link" data-dialog-open="privacyDialog">Privacy</button>
+    <span class="footer-spacer"></span>
+    <span class="footer-meta">Runs locally · nothing uploaded</span>
+    <span class="footer-sep" aria-hidden="true"></span>
+    <span class="footer-credit">Built by <a href="https://farhan.app" rel="noopener">Farhan</a></span>
+  </footer>
+
+  <nav class="mobile-nav" aria-label="Primary">
+    <ul>
+      <li>
+        <a class="mobile-nav-item" href="/">
+          <span class="mobile-nav-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" focusable="false"><path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></span>
+          Home
+        </a>
+      </li>
+      <li>
+        <a class="mobile-nav-item" href="/merge/">
+          <span class="mobile-nav-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" focusable="false"><path d="m8 6 4-4 4 4"/><path d="M12 2v10.3a4 4 0 0 1-1.172 2.872L4 22"/><path d="m20 22-5-5"/></svg></span>
+          Merge
+        </a>
+      </li>
+      <li>
+        <a class="mobile-nav-item" href="/edit/">
+          <span class="mobile-nav-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" focusable="false"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg></span>
+          Edit
+        </a>
+      </li>
+      <li>
+        <button type="button" class="mobile-nav-item" data-theme-toggle aria-label="Switch to dark theme">
+          <span class="mobile-nav-icon" aria-hidden="true">
+            <svg class="icon theme-icon-light" viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+            <svg class="icon theme-icon-dark" viewBox="0 0 24 24" focusable="false"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+          </span>
+          Theme
+        </button>
+      </li>
+    </ul>
+  </nav>
+
+  <dialog class="modal" id="aboutDialog" aria-labelledby="aboutTitle">
+    <div class="modal__inner">
+      <div class="modal__header">
+        <h2 id="aboutTitle" class="modal__title">About PDF Tools</h2>
+        <button type="button" class="btn btn-ghost btn-icon btn-sm" data-dialog-close aria-label="Close dialog">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="modal__body">
+        <p>PDF Tools is a small set of free, browser-based utilities for everyday PDF jobs: merging files and adding text or a signature to a page.</p>
+        <p class="modal__muted">Everything runs client-side with <a href="https://pdf-lib.js.org/" rel="noopener">pdf-lib</a> and <a href="https://mozilla.github.io/pdf.js/" rel="noopener">pdf.js</a>. There is no backend, no database and no account.</p>
+        <ul class="modal__links">
+          <li>Built by <a href="https://farhan.app" rel="noopener">Farhan</a></li>
+          <li>Design benchmarked against <a href="https://app-blueprint.farhan.app/" rel="noopener">App Blueprint</a></li>
+        </ul>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog class="modal" id="privacyDialog" aria-labelledby="privacyTitle">
+    <div class="modal__inner">
+      <div class="modal__header">
+        <h2 id="privacyTitle" class="modal__title">Privacy</h2>
+        <button type="button" class="btn btn-ghost btn-icon btn-sm" data-dialog-close aria-label="Close dialog">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="modal__body">
+        <p>Your files are processed entirely on your device and are never uploaded. This site sets no cookies and uses no analytics.</p>
+        <p class="modal__muted">The only optional network request is to Google Fonts, and only when you pick a Google font in the editor. Your theme preference is stored in your browser’s local storage.</p>
+      </div>
+    </div>
+  </dialog>
+
+  <script src="/assets/common.js" defer></script>
+</body>
+</html>
