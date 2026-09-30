@@ -2,7 +2,7 @@
 "use strict";
 
 (() => {
-  const { formatBytes, isPdfFile, attachDropzone, downloadBlob, makeStatus, describePdfError } = PDFTools;
+  const { formatBytes, isPdfFile, attachDropzone, downloadBlob, makeStatus, describePdfError, announce, icon } = PDFTools;
 
   const dropzone = document.getElementById("dropzone");
   const fileInput = document.getElementById("fileInput");
@@ -53,7 +53,7 @@
     clearBtn.disabled = busy || files.length === 0;
     if (files.length === 0) summaryEl.textContent = "";
     else if (files.length === 1) summaryEl.textContent = "Add at least one more PDF to merge.";
-    else summaryEl.textContent = `${files.length} files · ${files.reduce((n, f) => n + f.pageCount, 0)} pages total. Drag ⠿ or use the arrows to reorder.`;
+    else summaryEl.textContent = `${files.length} files · ${files.reduce((n, f) => n + f.pageCount, 0)} pages total. Drag the handle or use the arrows to reorder.`;
   }
 
   function renderItem(f, index) {
@@ -63,38 +63,43 @@
 
     const handle = document.createElement("span");
     handle.className = "drag-handle";
-    handle.textContent = "⠿";
     handle.setAttribute("aria-hidden", "true");
+    handle.appendChild(icon("grip", "icon icon-sm"));
     handle.addEventListener("pointerdown", (e) => startDrag(e, li));
 
+    const num = document.createElement("span");
+    num.className = "file-item__index";
+    num.setAttribute("aria-hidden", "true");
+    num.textContent = String(index + 1);
+
     const info = document.createElement("div");
-    info.className = "file-info";
-    const name = document.createElement("div");
-    name.className = "file-name";
+    info.className = "file-item__info";
+    const name = document.createElement("span");
+    name.className = "file-item__name";
     name.textContent = f.name;
     name.title = f.name;
-    const meta = document.createElement("div");
-    meta.className = "file-meta";
+    const meta = document.createElement("span");
+    meta.className = "file-item__meta";
     meta.textContent = `${formatBytes(f.size)} · ${f.pageCount} page${f.pageCount === 1 ? "" : "s"}`;
     info.append(name, meta);
 
     const actions = document.createElement("div");
-    actions.className = "file-actions";
+    actions.className = "file-item__actions";
     actions.append(
-      iconBtn("↑", `Move ${f.name} up`, () => move(index, -1), index === 0),
-      iconBtn("↓", `Move ${f.name} down`, () => move(index, 1), index === files.length - 1),
-      iconBtn("✕", `Remove ${f.name}`, () => remove(index))
+      iconBtn("chevron-up", `Move ${f.name} up`, () => move(index, -1), index === 0),
+      iconBtn("chevron-down", `Move ${f.name} down`, () => move(index, 1), index === files.length - 1),
+      iconBtn("x", `Remove ${f.name}`, () => remove(index))
     );
 
-    li.append(handle, info, actions);
+    li.append(handle, num, info, actions);
     return li;
   }
 
-  function iconBtn(label, ariaLabel, onClick, disabled = false) {
+  function iconBtn(iconName, ariaLabel, onClick, disabled = false) {
     const b = document.createElement("button");
     b.type = "button";
-    b.className = "btn btn-compact";
-    b.textContent = label;
+    b.className = "btn btn-ghost btn-icon btn-sm";
+    b.appendChild(icon(iconName));
     b.setAttribute("aria-label", ariaLabel);
     b.disabled = disabled;
     b.addEventListener("click", onClick);
@@ -106,12 +111,22 @@
     if (target < 0 || target >= files.length) return;
     [files[index], files[target]] = [files[target], files[index]];
     render();
+    const moved = files[target];
+    announce(`Moved ${moved.name} to position ${target + 1} of ${files.length}.`);
+    // Keep keyboard focus on the same file's controls after re-render.
+    const [up, down] = listEl.children[target].querySelectorAll("button");
+    const preferred = delta < 0 ? up : down;
+    (preferred.disabled ? (delta < 0 ? down : up) : preferred).focus();
   }
 
   function remove(index) {
-    files.splice(index, 1);
+    const [removed] = files.splice(index, 1);
     if (!files.length) status.clear();
     render();
+    announce(`Removed ${removed.name}. ${files.length} file${files.length === 1 ? "" : "s"} remaining.`);
+    const next = listEl.children[Math.min(index, files.length - 1)];
+    if (next) next.querySelector('[aria-label^="Remove"]').focus();
+    else dropzone.focus();
   }
 
   /* Pointer-based drag reordering — works with both mouse and touch. */

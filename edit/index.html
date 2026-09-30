@@ -1,58 +1,158 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>PDF Editor — Add Text to PDF Online Free</title>
-  <meta name="author" content="farhan.app">
-  <meta name="description" content="Edit PDF files online for free. Add, position and format text directly in your browser — nothing is uploaded. Built by Farhan — farhan.app">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Edit PDF Online Free — Add Text &amp; Signature — PDF Tools</title>
+  <meta name="description" content="Edit PDF files online for free. Add text or a signature image to any page, choose fonts, sizes and colours, and export — all in your browser with nothing uploaded.">
+  <meta name="author" content="Farhan — farhan.app">
+  <meta name="robots" content="index, follow, max-image-preview:large">
   <link rel="canonical" href="https://pdf.farhan.app/edit/">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="color-scheme" content="light dark">
+
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="PDF Tools">
-  <meta property="og:title" content="PDF Editor — Add Text to PDF Online Free">
-  <meta property="og:description" content="Add, position and format text on any PDF directly in your browser. Nothing is uploaded.">
+  <meta property="og:locale" content="en_GB">
+  <meta property="og:title" content="Edit PDF Online Free — Add Text &amp; Signature — PDF Tools">
+  <meta property="og:description" content="Add text or a signature to any PDF directly in your browser. Fonts, sizes, colours and alignment. Nothing is uploaded.">
   <meta property="og:url" content="https://pdf.farhan.app/edit/">
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="PDF Editor — Add Text to PDF Online Free">
-  <meta name="twitter:description" content="Add, position and format text on any PDF directly in your browser. Built by Farhan — farhan.app">
+  <meta property="og:image" content="https://pdf.farhan.app/assets/og-edit.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Edit PDF — add text and signatures in your browser with PDF Tools">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Edit PDF Online Free — Add Text &amp; Signature — PDF Tools">
+  <meta name="twitter:description" content="Add text or a signature to any PDF directly in your browser. Built by Farhan — farhan.app">
+  <meta name="twitter:image" content="https://pdf.farhan.app/assets/og-edit.png">
+
+  <link rel="icon" href="/assets/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="preload" href="/assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/style.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📄</text></svg>">
+  <script>
+    // Apply the stored theme before first paint to avoid a flash.
+    (function () {
+      try {
+        var t = localStorage.getItem("app-theme");
+        if (t === "dark" || t === "light") document.documentElement.setAttribute("data-theme", t);
+        var dark = t ? t === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+        var m = document.querySelector('meta[name="theme-color"]');
+        if (m) m.setAttribute("content", dark ? "#09090b" : "#ffffff");
+      } catch (_) {}
+    })();
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "@id": "https://pdf.farhan.app/edit/#app",
+        "name": "PDF Editor",
+        "url": "https://pdf.farhan.app/edit/",
+        "description": "Add text or a signature image to any PDF page directly in your browser. Choose fonts, sizes, colours and alignment; nothing is uploaded.",
+        "applicationCategory": "UtilitiesApplication",
+        "operatingSystem": "Any",
+        "browserRequirements": "Requires JavaScript",
+        "isAccessibleForFree": true,
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "isPartOf": { "@id": "https://pdf.farhan.app/#website" },
+        "author": { "@type": "Person", "name": "Farhan", "url": "https://farhan.app" }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "PDF Tools", "item": "https://pdf.farhan.app/" },
+          { "@type": "ListItem", "position": 2, "name": "Edit PDF", "item": "https://pdf.farhan.app/edit/" }
+        ]
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
-  <header class="site-header">
-    <a class="brand" href="/">📄 PDF Tools</a>
-    <nav class="site-nav" aria-label="Tools">
-      <a href="/merge/">Merge</a>
-      <a href="/edit/" aria-current="page">Edit</a>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="topbar">
+    <a href="/" class="topbar-logo">
+      <span class="logo-mark" aria-hidden="true">
+        <svg class="icon" viewBox="0 0 24 24" focusable="false"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+      </span>
+      <span>PDF Tools</span>
+    </a>
+    <a href="/changelog/" class="version-pill">v1.2.0<span class="visually-hidden"> — view changelog</span></a>
+
+    <div class="topbar-spacer"></div>
+
+    <nav class="topbar-nav" aria-label="Tools">
+      <a class="btn btn-ghost btn-sm" href="/merge/">Merge</a>
+      <a class="btn btn-ghost btn-sm" href="/edit/" aria-current="page">Edit</a>
     </nav>
+    <span class="topbar-divider" aria-hidden="true"></span>
+    <button type="button" class="btn btn-ghost btn-icon btn-sm" data-theme-toggle aria-label="Switch to dark theme">
+      <svg class="icon icon-sm theme-icon-light" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+      <svg class="icon icon-sm theme-icon-dark" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+    </button>
   </header>
 
-  <main class="editor-main">
+  <main id="main" class="main" tabindex="-1">
     <!-- Upload state -->
-    <section class="editor-intro" id="intro">
-      <h1 class="page-title">Edit PDF</h1>
-      <p class="page-sub">Add text anywhere on a PDF — pick font, size, colour and alignment, drag to position, then export. The original pages are kept at full quality.</p>
+    <section class="canvas-area" id="intro" aria-labelledby="pageTitle">
+      <div class="page page-narrow">
+        <header class="page-header">
+          <p class="eyebrow">Tool</p>
+          <h1 id="pageTitle" class="page-title">Edit PDF</h1>
+          <p class="page-sub">Add text or a signature anywhere on a PDF — pick font, size, colour and alignment, drag to position, then export. The original pages are kept at full quality.</p>
+        </header>
 
-      <button type="button" class="dropzone" id="dropzone">
-        <span class="dz-icon" aria-hidden="true">✏️</span>
-        <p><strong>Choose a PDF</strong><br>or drag &amp; drop it here</p>
-      </button>
-      <input type="file" id="fileInput" class="visually-hidden" accept="application/pdf,.pdf" aria-hidden="true" tabindex="-1">
+        <div class="canvas">
+          <div class="canvas-section">
+            <button type="button" class="dropzone" id="dropzone">
+              <span class="dropzone__icon" aria-hidden="true">
+                <svg class="icon" viewBox="0 0 24 24" focusable="false"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+              </span>
+              <span class="dropzone__title">Choose a PDF</span>
+              <span class="dropzone__hint">or drag and drop it here</span>
+              <span class="chip chip-outline chip-mono dropzone__meta">PDF · single file</span>
+            </button>
+            <input type="file" id="fileInput" class="visually-hidden" accept="application/pdf,.pdf" aria-hidden="true" tabindex="-1">
 
-      <p class="status-line" id="introStatus" role="status" aria-live="polite"></p>
+            <p class="status-line" id="introStatus" role="status" aria-live="polite"></p>
+          </div>
+
+          <section class="canvas-section" aria-labelledby="howTitle">
+            <h2 id="howTitle" class="section-title">How it works</h2>
+            <ol class="steps">
+              <li><span><strong>Open a PDF.</strong> Pages are previewed in your browser; the file never leaves your device.</span></li>
+              <li><span><strong>Add text or a signature.</strong> Choose <em>Text</em> or <em>Signature</em>, then click the spot on the page. Drag to move, double-click text to edit.</span></li>
+              <li><span><strong>Style and export.</strong> Pick a standard font or any Google Font, set size and colour, then download <code>edited.pdf</code>.</span></li>
+            </ol>
+          </section>
+        </div>
+      </div>
     </section>
 
     <!-- Editor state -->
-    <section id="editor" hidden>
-      <div class="editor-toolbar" role="toolbar" aria-label="Text formatting">
-        <button type="button" class="btn btn-compact btn-primary" id="addTextBtn">＋ Text</button>
-        <button type="button" class="btn btn-compact" id="addImageBtn">🖊 Signature</button>
+    <section class="editor" id="editor" aria-labelledby="editorTitle" hidden>
+      <h2 id="editorTitle" class="visually-hidden">Editor</h2>
+
+      <div class="editor-toolbar" role="toolbar" aria-label="Editing tools">
+        <button type="button" class="btn btn-outline btn-sm" id="addTextBtn" aria-pressed="false">
+          <svg class="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" x2="15" y1="20" y2="20"/><line x1="12" x2="12" y1="4" y2="20"/></svg>
+          Text
+        </button>
+        <button type="button" class="btn btn-outline btn-sm" id="addImageBtn" aria-pressed="false">
+          <svg class="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15.707 21.293a1 1 0 0 1-1.414 0l-1.586-1.586a1 1 0 0 1 0-1.414l5.586-5.586a1 1 0 0 1 1.414 0l1.586 1.586a1 1 0 0 1 0 1.414z"/><path d="m18 13-1.375-6.874a1 1 0 0 0-.746-.776L3.235 2.028a1 1 0 0 0-1.207 1.207L5.35 15.879a1 1 0 0 0 .776.746L13 18"/><path d="m2.3 2.3 7.286 7.286"/><circle cx="11" cy="11" r="2"/></svg>
+          Signature
+        </button>
         <input type="file" id="imageInput" class="visually-hidden" accept="image/png,image/jpeg,image/svg+xml,image/webp" aria-hidden="true" tabindex="-1">
         <span class="tb-sep" aria-hidden="true"></span>
 
         <div class="tb-group">
           <label class="visually-hidden" for="fontSelect">Font</label>
-          <select id="fontSelect">
+          <select id="fontSelect" class="input">
             <optgroup label="Standard">
               <option value="Helvetica" selected>Helvetica</option>
               <option value="Times">Times</option>
@@ -63,52 +163,150 @@
           </select>
 
           <label class="visually-hidden" for="sizeInput">Font size</label>
-          <input type="number" id="sizeInput" min="6" max="144" step="1" value="16" inputmode="numeric" aria-label="Font size">
+          <input type="number" id="sizeInput" class="input" min="6" max="144" step="1" value="16" inputmode="numeric">
 
           <label class="visually-hidden" for="colorInput">Text colour</label>
-          <input type="color" id="colorInput" value="#111111" aria-label="Text colour">
+          <input type="color" id="colorInput" class="input" value="#111111">
         </div>
 
-        <div class="tb-group">
-          <button type="button" class="btn btn-compact" id="boldBtn" aria-pressed="false" aria-label="Bold"><b>B</b></button>
-          <button type="button" class="btn btn-compact" id="italicBtn" aria-pressed="false" aria-label="Italic"><i>I</i></button>
+        <span class="tb-sep" aria-hidden="true"></span>
+
+        <div class="tb-group" role="group" aria-label="Text style">
+          <button type="button" class="btn btn-ghost btn-icon btn-sm" id="boldBtn" aria-pressed="false" aria-label="Bold">
+            <svg class="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 12h9a4 4 0 0 1 0 8H7a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h7a4 4 0 0 1 0 8"/></svg>
+          </button>
+          <button type="button" class="btn btn-ghost btn-icon btn-sm" id="italicBtn" aria-pressed="false" aria-label="Italic">
+            <svg class="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><line x1="19" x2="10" y1="4" y2="4"/><line x1="14" x2="5" y1="20" y2="20"/><line x1="15" x2="9" y1="4" y2="20"/></svg>
+          </button>
         </div>
 
         <div class="tb-group" role="group" aria-label="Text alignment">
-          <button type="button" class="btn btn-compact" data-align="left" aria-pressed="true" aria-label="Align left">⇤</button>
-          <button type="button" class="btn btn-compact" data-align="center" aria-pressed="false" aria-label="Align centre">⇹</button>
-          <button type="button" class="btn btn-compact" data-align="right" aria-pressed="false" aria-label="Align right">⇥</button>
+          <button type="button" class="btn btn-ghost btn-icon btn-sm" data-align="left" aria-pressed="true" aria-label="Align left">
+            <svg class="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 12H3"/><path d="M17 18H3"/><path d="M21 6H3"/></svg>
+          </button>
+          <button type="button" class="btn btn-ghost btn-icon btn-sm" data-align="center" aria-pressed="false" aria-label="Align centre">
+            <svg class="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M17 12H7"/><path d="M19 18H5"/><path d="M21 6H3"/></svg>
+          </button>
+          <button type="button" class="btn btn-ghost btn-icon btn-sm" data-align="right" aria-pressed="false" aria-label="Align right">
+            <svg class="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21 12H9"/><path d="M21 18H7"/><path d="M21 6H3"/></svg>
+          </button>
         </div>
 
-        <button type="button" class="btn btn-compact" id="deleteBtn" disabled aria-label="Delete selected text">🗑</button>
+        <span class="tb-sep" aria-hidden="true"></span>
+
+        <button type="button" class="btn btn-ghost btn-icon btn-sm" id="deleteBtn" disabled aria-label="Delete selected element">
+          <svg class="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+        </button>
 
         <span class="tb-spacer"></span>
 
-        <button type="button" class="btn btn-compact" id="resetBtn">Close</button>
-        <button type="button" class="btn btn-compact btn-primary" id="exportBtn">Export PDF</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="resetBtn">Close</button>
+        <button type="button" class="btn btn-primary btn-sm" id="exportBtn">
+          <svg class="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          Export PDF
+        </button>
       </div>
 
-      <div class="font-browser" id="fontBrowser" hidden>
-        <div class="fb-head">
-          <label class="visually-hidden" for="fontSearch">Search Google Fonts</label>
-          <input type="search" id="fontSearch" placeholder="Search 1,900+ Google Fonts…" autocomplete="off">
-          <button type="button" class="btn btn-compact" id="fontBrowserClose" aria-label="Close font search">✕</button>
+      <div class="editor-body">
+        <section class="font-browser" id="fontBrowser" aria-labelledby="fontBrowserTitle" hidden>
+          <h3 id="fontBrowserTitle" class="visually-hidden">Browse Google Fonts</h3>
+          <div class="fb-head">
+            <label class="visually-hidden" for="fontSearch">Search Google Fonts</label>
+            <input type="search" id="fontSearch" class="input" placeholder="Search 1,900+ Google Fonts…" autocomplete="off" aria-describedby="fontResultsStatus">
+            <button type="button" class="btn btn-ghost btn-icon btn-sm" id="fontBrowserClose" aria-label="Close font browser">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <p class="visually-hidden" id="fontResultsStatus" role="status" aria-live="polite"></p>
+          <ul class="fb-results" id="fontResults" aria-labelledby="fontBrowserTitle"></ul>
+        </section>
+
+        <div class="canvas-area editor-stage" id="stage">
+          <p class="editor-hint" id="hint">Choose <strong>Text</strong> or <strong>Signature</strong>, then click the page where it should go. Drag to move; double-click text to edit.</p>
+          <p class="status-line status-line--center" id="editStatus" role="status" aria-live="polite"></p>
+          <div id="pages"></div>
         </div>
-        <div class="fb-results" id="fontResults" role="listbox" aria-label="Font search results"></div>
-      </div>
-
-      <div class="editor-stage" id="stage">
-        <p class="editor-hint" id="hint">Tap “＋ Text”, then tap the page where the text should go. Drag to move; double-tap to edit.</p>
-        <p class="status-line editor-hint" id="editStatus" role="status" aria-live="polite"></p>
-        <div id="pages"></div>
       </div>
     </section>
   </main>
 
-  <footer class="site-footer">
-    <p>Files are processed locally on your device — nothing is uploaded.</p>
-    <p class="footer-credit">Built by <a href="https://farhan.app" target="_blank" rel="noopener">Farhan</a></p>
+  <footer class="app-footer">
+    <button type="button" class="app-footer__link" data-dialog-open="aboutDialog">About</button>
+    <span class="footer-sep" aria-hidden="true"></span>
+    <a href="/changelog/">Changelog</a>
+    <span class="footer-sep" aria-hidden="true"></span>
+    <button type="button" class="app-footer__link" data-dialog-open="privacyDialog">Privacy</button>
+    <span class="footer-spacer"></span>
+    <span class="footer-meta">Runs locally · nothing uploaded</span>
+    <span class="footer-sep" aria-hidden="true"></span>
+    <span class="footer-credit">Built by <a href="https://farhan.app" rel="noopener">Farhan</a></span>
   </footer>
+
+  <nav class="mobile-nav" aria-label="Primary">
+    <ul>
+      <li>
+        <a class="mobile-nav-item" href="/">
+          <span class="mobile-nav-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" focusable="false"><path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></span>
+          Home
+        </a>
+      </li>
+      <li>
+        <a class="mobile-nav-item" href="/merge/">
+          <span class="mobile-nav-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" focusable="false"><path d="m8 6 4-4 4 4"/><path d="M12 2v10.3a4 4 0 0 1-1.172 2.872L4 22"/><path d="m20 22-5-5"/></svg></span>
+          Merge
+        </a>
+      </li>
+      <li>
+        <a class="mobile-nav-item" href="/edit/" aria-current="page">
+          <span class="mobile-nav-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" focusable="false"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg></span>
+          Edit
+        </a>
+      </li>
+      <li>
+        <button type="button" class="mobile-nav-item" data-theme-toggle aria-label="Switch to dark theme">
+          <span class="mobile-nav-icon" aria-hidden="true">
+            <svg class="icon theme-icon-light" viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+            <svg class="icon theme-icon-dark" viewBox="0 0 24 24" focusable="false"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+          </span>
+          Theme
+        </button>
+      </li>
+    </ul>
+  </nav>
+
+  <dialog class="modal" id="aboutDialog" aria-labelledby="aboutTitle">
+    <div class="modal__inner">
+      <div class="modal__header">
+        <h2 id="aboutTitle" class="modal__title">About PDF Tools</h2>
+        <button type="button" class="btn btn-ghost btn-icon btn-sm" data-dialog-close aria-label="Close dialog">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="modal__body">
+        <p>PDF Tools is a small set of free, browser-based utilities for everyday PDF jobs: merging files and adding text or a signature to a page.</p>
+        <p class="modal__muted">Everything runs client-side with <a href="https://pdf-lib.js.org/" rel="noopener">pdf-lib</a> and <a href="https://mozilla.github.io/pdf.js/" rel="noopener">pdf.js</a>. There is no backend, no database and no account.</p>
+        <ul class="modal__links">
+          <li>Built by <a href="https://farhan.app" rel="noopener">Farhan</a></li>
+          <li>Design benchmarked against <a href="https://app-blueprint.farhan.app/" rel="noopener">App Blueprint</a></li>
+        </ul>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog class="modal" id="privacyDialog" aria-labelledby="privacyTitle">
+    <div class="modal__inner">
+      <div class="modal__header">
+        <h2 id="privacyTitle" class="modal__title">Privacy</h2>
+        <button type="button" class="btn btn-ghost btn-icon btn-sm" data-dialog-close aria-label="Close dialog">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="modal__body">
+        <p>Your files are processed entirely on your device and are never uploaded. This site sets no cookies and uses no analytics.</p>
+        <p class="modal__muted">The only optional network request is to Google Fonts, and only when you pick a Google font in the editor. Your theme preference is stored in your browser’s local storage.</p>
+      </div>
+    </div>
+  </dialog>
 
   <script src="/assets/vendor/pdfjs-3.11.174.min.js"></script>
   <script src="/assets/vendor/pdf-lib-1.17.1.min.js"></script>

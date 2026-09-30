@@ -7,6 +7,9 @@
 /assets/vendor/*
   Cache-Control: public, max-age=31536000, immutable
 
+/assets/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
 /assets/*.css
   Cache-Control: public, max-age=3600
 
@@ -14,4 +17,13 @@
   Cache-Control: public, max-age=3600
 
 /assets/*.json
+  Cache-Control: public, max-age=86400
+
+/assets/*.png
+  Cache-Control: public, max-age=86400
+
+/assets/*.svg
+  Cache-Control: public, max-age=86400
+
+/manifest.webmanifest
   Cache-Control: public, max-age=86400

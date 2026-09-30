@@ -3,7 +3,7 @@
 "use strict";
 
 (() => {
-  const { isPdfFile, attachDropzone, downloadBlob, makeStatus, describePdfError } = PDFTools;
+  const { isPdfFile, attachDropzone, downloadBlob, makeStatus, describePdfError, announce } = PDFTools;
 
   pdfjsLib.GlobalWorkerOptions.workerSrc = "/assets/vendor/pdfjs-worker-3.11.174.min.js";
 
@@ -57,7 +57,9 @@
   const fontBrowser = document.getElementById("fontBrowser");
   const fontSearch = document.getElementById("fontSearch");
   const fontResults = document.getElementById("fontResults");
+  const fontResultsStatus = document.getElementById("fontResultsStatus");
   const fontBrowserClose = document.getElementById("fontBrowserClose");
+  const HINT_DEFAULT = hintEl.innerHTML;
 
   let pdfBytes = null; // original file bytes, used for export
   let pdfjsDoc = null;
@@ -115,7 +117,9 @@
   }
 
   function pageScale(wPt) {
-    const available = Math.min(stage.clientWidth - 16, 900);
+    const cs = getComputedStyle(stage);
+    const inner = stage.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    const available = Math.min(inner, 900);
     return Math.max(available / wPt, 0.1);
   }
 
@@ -262,53 +266,67 @@
     renderFontResults("");
     fontSearch.focus();
     loadCatalog().then(() => renderFontResults(fontSearch.value)).catch(() => {
-      fontResults.innerHTML = "";
-      const p = document.createElement("p");
-      p.className = "fb-note";
-      p.textContent = "Couldn’t load the font list. Check your connection and try again.";
-      fontResults.appendChild(p);
+      fontResults.textContent = "";
+      fontResults.appendChild(fontNote("Couldn’t load the font list. Check your connection and try again."));
+      fontResultsStatus.textContent = "Couldn’t load the font list.";
     });
   }
 
   function closeFontBrowser() {
+    if (fontBrowser.hidden) return;
     fontBrowser.hidden = true;
     syncToolbar();
+    fontSelect.focus();
+  }
+
+  function fontNote(text) {
+    const li = document.createElement("li");
+    li.className = "fb-note";
+    li.textContent = text;
+    return li;
   }
 
   function renderFontResults(query) {
     fontResults.textContent = "";
     if (!fontCatalog) {
-      const p = document.createElement("p");
-      p.className = "fb-note";
-      p.textContent = "Loading font list…";
-      fontResults.appendChild(p);
+      fontResults.appendChild(fontNote("Loading font list…"));
+      fontResultsStatus.textContent = "Loading font list…";
       return;
     }
     const q = query.trim().toLowerCase();
     let shown = 0;
+    let total = 0;
     for (const family of fontCatalog.keys()) {
       if (q && !family.toLowerCase().includes(q)) continue;
+      total++;
+      if (shown >= 60) continue;
+      const li = document.createElement("li");
       const b = document.createElement("button");
       b.type = "button";
-      b.setAttribute("role", "option");
       b.textContent = family;
       b.addEventListener("click", () => {
         useGoogleFont(family);
         closeFontBrowser();
+        announce(`Font set to ${family}.`);
       });
-      fontResults.appendChild(b);
-      if (++shown >= 60) break;
+      li.appendChild(b);
+      fontResults.appendChild(li);
+      shown++;
     }
     if (!shown) {
-      const p = document.createElement("p");
-      p.className = "fb-note";
-      p.textContent = "No fonts match that search.";
-      fontResults.appendChild(p);
+      fontResults.appendChild(fontNote("No fonts match that search."));
+      fontResultsStatus.textContent = "No fonts match that search.";
+    } else {
+      fontResultsStatus.textContent = shown < total
+        ? `Showing the first ${shown} of ${total} matching fonts. Keep typing to narrow the list.`
+        : `${shown} matching font${shown === 1 ? "" : "s"}.`;
     }
   }
 
   fontSearch.addEventListener("input", () => renderFontResults(fontSearch.value));
-  fontSearch.addEventListener("keydown", (e) => { if (e.key === "Escape") closeFontBrowser(); });
+  fontBrowser.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") { e.preventDefault(); closeFontBrowser(); }
+  });
   fontBrowserClose.addEventListener("click", closeFontBrowser);
 
   /* ---------- Placement ---------- */
@@ -341,14 +359,12 @@
     placing = mode;
     if (mode !== "image") pendingImage = null;
     stage.classList.toggle("placing", !!mode);
-    addTextBtn.classList.toggle("toggled", mode === "text");
     addTextBtn.setAttribute("aria-pressed", String(mode === "text"));
-    addImageBtn.classList.toggle("toggled", mode === "image");
     addImageBtn.setAttribute("aria-pressed", String(mode === "image"));
-    hintEl.textContent =
-      mode === "text" ? "Now tap or click the spot on the page where the text should go."
-      : mode === "image" ? "Now tap or click the spot on the page where the signature should go."
-      : "Tap “＋ Text”, then tap the page where the text should go. Drag to move; double-tap to edit.";
+    if (mode === "text") hintEl.textContent = "Now click or tap the spot on the page where the text should go.";
+    else if (mode === "image") hintEl.textContent = "Now click or tap the spot on the page where the signature should go.";
+    else hintEl.innerHTML = HINT_DEFAULT;
+    if (mode) announce(hintEl.textContent);
   }
 
   /* ---------- Text boxes ---------- */
@@ -372,6 +388,7 @@
     const el = document.createElement("div");
     el.className = "tbox";
     el.setAttribute("role", "textbox");
+    el.setAttribute("aria-multiline", "true");
     el.setAttribute("aria-label", "Text element — Enter to edit, arrow keys to move, Delete to remove");
     el.tabIndex = 0;
     el.textContent = box.text;
@@ -427,21 +444,18 @@
     lastFontValue = current.font;
     sizeInput.value = current.size;
     colorInput.value = current.color;
-    boldBtn.classList.toggle("toggled", current.bold);
     boldBtn.setAttribute("aria-pressed", String(current.bold));
-    italicBtn.classList.toggle("toggled", current.italic);
     italicBtn.setAttribute("aria-pressed", String(current.italic));
-    alignBtns.forEach((b) => {
-      const on = b.dataset.align === current.align;
-      b.classList.toggle("toggled", on);
-      b.setAttribute("aria-pressed", String(on));
-    });
+    alignBtns.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.align === current.align)));
   }
 
   function removeBox(box) {
+    const hadFocus = box.el.contains(document.activeElement);
     box.el.remove();
     boxes = boxes.filter((b) => b !== box);
     if (selected === box) select(null);
+    announce(box.type === "text" ? "Text removed." : "Signature removed.");
+    if (hadFocus) addTextBtn.focus();
   }
 
   /* Dragging: pointer capture on the box; a small threshold distinguishes tap from drag. */

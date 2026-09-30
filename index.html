@@ -1,58 +1,322 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>PDF Tools — Free, Private, Browser-Based</title>
-  <meta name="author" content="farhan.app">
-  <meta name="description" content="Free browser-based PDF tools. Merge and edit PDF files privately — your documents never leave your device. Built by Farhan — farhan.app">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>PDF Tools — Free, Private, Browser-Based PDF Merger &amp; Editor</title>
+  <meta name="description" content="Free browser-based PDF tools. Merge PDFs and add text or a signature to any PDF privately — files never leave your device. No uploads, no accounts, no tracking.">
+  <meta name="author" content="Farhan — farhan.app">
+  <meta name="robots" content="index, follow, max-image-preview:large">
   <link rel="canonical" href="https://pdf.farhan.app/">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="color-scheme" content="light dark">
+
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="PDF Tools">
+  <meta property="og:locale" content="en_GB">
   <meta property="og:title" content="PDF Tools — Free, Private, Browser-Based">
   <meta property="og:description" content="Merge and edit PDF files directly in your browser. No uploads, no accounts, no tracking.">
   <meta property="og:url" content="https://pdf.farhan.app/">
-  <meta name="twitter:card" content="summary">
+  <meta property="og:image" content="https://pdf.farhan.app/assets/og-home.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="PDF Tools — simple, private PDF tools that run in your browser">
+  <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="PDF Tools — Free, Private, Browser-Based">
   <meta name="twitter:description" content="Merge and edit PDF files directly in your browser. Built by Farhan — farhan.app">
+  <meta name="twitter:image" content="https://pdf.farhan.app/assets/og-home.png">
+
+  <link rel="icon" href="/assets/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="preload" href="/assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/style.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📄</text></svg>">
+  <script>
+    // Apply the stored theme before first paint to avoid a flash.
+    (function () {
+      try {
+        var t = localStorage.getItem("app-theme");
+        if (t === "dark" || t === "light") document.documentElement.setAttribute("data-theme", t);
+        var dark = t ? t === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+        var m = document.querySelector('meta[name="theme-color"]');
+        if (m) m.setAttribute("content", dark ? "#09090b" : "#ffffff");
+      } catch (_) {}
+    })();
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://pdf.farhan.app/#website",
+        "url": "https://pdf.farhan.app/",
+        "name": "PDF Tools",
+        "description": "Free, private, browser-based PDF tools. Merge PDFs and add text or a signature to any PDF without uploading anything.",
+        "inLanguage": "en",
+        "publisher": { "@id": "https://farhan.app/#person" }
+      },
+      {
+        "@type": "Person",
+        "@id": "https://farhan.app/#person",
+        "name": "Farhan",
+        "url": "https://farhan.app"
+      },
+      {
+        "@type": "WebApplication",
+        "@id": "https://pdf.farhan.app/#app",
+        "name": "PDF Tools",
+        "url": "https://pdf.farhan.app/",
+        "applicationCategory": "UtilitiesApplication",
+        "operatingSystem": "Any",
+        "browserRequirements": "Requires JavaScript",
+        "isAccessibleForFree": true,
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "featureList": [
+          "Merge multiple PDF files into one",
+          "Add text to any PDF page",
+          "Add a signature or image to a PDF",
+          "All processing happens in the browser"
+        ],
+        "author": { "@id": "https://farhan.app/#person" }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Are my files uploaded anywhere?",
+            "acceptedAnswer": { "@type": "Answer", "text": "No. Every tool runs entirely in your browser using JavaScript. Your PDFs are read from your device, processed in memory and downloaded back to you. There is no server, no account and no analytics." }
+          },
+          {
+            "@type": "Question",
+            "name": "Is there a file size limit?",
+            "acceptedAnswer": { "@type": "Answer", "text": "There is no fixed limit. The only constraint is your browser's available memory, so very large files work best on a desktop browser." }
+          },
+          {
+            "@type": "Question",
+            "name": "Does merging or editing reduce quality?",
+            "acceptedAnswer": { "@type": "Answer", "text": "No. Pages are copied object-for-object and text or images are embedded natively into the original PDF. Nothing is rasterised or recompressed." }
+          },
+          {
+            "@type": "Question",
+            "name": "Which fonts can I use in the editor?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Helvetica, Times and Courier work fully offline. You can also pick from more than 1,900 Google Fonts; the font file is only fetched from Google when you choose one, and it is embedded into your PDF." }
+          },
+          {
+            "@type": "Question",
+            "name": "Can I open a password-protected PDF?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Not yet. Remove the password first, for example by printing the file to a new PDF, then merge or edit the unprotected copy." }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
-  <header class="site-header">
-    <a class="brand" href="/">📄 PDF Tools</a>
-    <nav class="site-nav" aria-label="Tools">
-      <a href="/merge/">Merge</a>
-      <a href="/edit/">Edit</a>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="topbar">
+    <a href="/" class="topbar-logo" aria-current="page">
+      <span class="logo-mark" aria-hidden="true">
+        <svg class="icon" viewBox="0 0 24 24" focusable="false"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+      </span>
+      <span>PDF Tools</span>
+    </a>
+    <a href="/changelog/" class="version-pill">v1.2.0<span class="visually-hidden"> — view changelog</span></a>
+
+    <div class="topbar-spacer"></div>
+
+    <nav class="topbar-nav" aria-label="Tools">
+      <a class="btn btn-ghost btn-sm" href="/merge/">Merge</a>
+      <a class="btn btn-ghost btn-sm" href="/edit/">Edit</a>
     </nav>
+    <span class="topbar-divider" aria-hidden="true"></span>
+    <button type="button" class="btn btn-ghost btn-icon btn-sm" data-theme-toggle aria-label="Switch to dark theme">
+      <svg class="icon icon-sm theme-icon-light" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+      <svg class="icon icon-sm theme-icon-dark" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+    </button>
   </header>
 
-  <main class="container">
-    <section class="hero">
-      <h1>Simple, private PDF tools</h1>
-      <p>Everything runs in your browser. Your files are never uploaded to a server.</p>
-    </section>
+  <main id="main" class="main" tabindex="-1">
+    <div class="canvas-area">
+      <div class="page">
+        <section class="hero" aria-labelledby="heroTitle">
+          <p class="eyebrow">Free · Private · Browser-based</p>
+          <h1 id="heroTitle" class="page-title">Simple, private PDF tools</h1>
+          <p class="page-sub">Merge and edit PDF files right in your browser. Your files never leave your device — no uploads, no accounts, no tracking.</p>
+          <ul class="hero-badges">
+            <li><span class="chip chip-green"><span class="chip-dot" aria-hidden="true"></span>Nothing uploaded</span></li>
+            <li><span class="chip chip-outline">No account</span></li>
+            <li><span class="chip chip-outline">Original quality</span></li>
+          </ul>
+        </section>
 
-    <section class="tool-grid">
-      <a class="tool-card" href="/merge/">
-        <div class="tool-icon" aria-hidden="true">🗂️</div>
-        <h2>Merge PDFs</h2>
-        <p>Combine multiple PDFs into one. Arrange the order before exporting. Original quality is preserved.</p>
-        <span class="tool-cta">Open tool →</span>
-      </a>
+        <section aria-labelledby="toolsTitle">
+          <h2 id="toolsTitle" class="visually-hidden">Tools</h2>
+          <ul class="tool-grid">
+            <li>
+              <article class="tool-card">
+                <span class="tool-card__icon" aria-hidden="true">
+                  <svg class="icon" viewBox="0 0 24 24" focusable="false"><path d="m8 6 4-4 4 4"/><path d="M12 2v10.3a4 4 0 0 1-1.172 2.872L4 22"/><path d="m20 22-5-5"/></svg>
+                </span>
+                <h3><a href="/merge/">Merge PDFs</a></h3>
+                <p>Combine multiple PDFs into one document. Arrange the order before exporting. Pages are copied as-is, so quality is unchanged.</p>
+                <span class="tool-card__cta" aria-hidden="true">Open tool <svg class="icon icon-sm" viewBox="0 0 24 24" focusable="false"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+              </article>
+            </li>
+            <li>
+              <article class="tool-card">
+                <span class="tool-card__icon" aria-hidden="true">
+                  <svg class="icon" viewBox="0 0 24 24" focusable="false"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg>
+                </span>
+                <h3><a href="/edit/">Edit PDF</a></h3>
+                <p>Add text or a signature anywhere on a PDF. Choose fonts, sizes, colours and alignment, then export a new file.</p>
+                <span class="tool-card__cta" aria-hidden="true">Open tool <svg class="icon icon-sm" viewBox="0 0 24 24" focusable="false"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+              </article>
+            </li>
+          </ul>
+        </section>
 
-      <a class="tool-card" href="/edit/">
-        <div class="tool-icon" aria-hidden="true">✏️</div>
-        <h2>Edit PDF</h2>
-        <p>Add text anywhere on a PDF. Choose fonts, sizes, colours and alignment, then export.</p>
-        <span class="tool-cta">Open tool →</span>
-      </a>
-    </section>
+        <section class="landing-section" aria-labelledby="whyTitle">
+          <h2 id="whyTitle" class="section-title">Why PDF Tools</h2>
+          <ul class="feature-grid">
+            <li class="feature">
+              <span class="feature__icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" focusable="false"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+              <h3>Private by design</h3>
+              <p>Everything runs on your device. There is no server to upload to, no account to create and no analytics script watching you.</p>
+            </li>
+            <li class="feature">
+              <span class="feature__icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></span>
+              <h3>Original quality</h3>
+              <p>Pages are copied object-for-object and text is embedded natively. Vectors, images and dimensions are preserved exactly.</p>
+            </li>
+            <li class="feature">
+              <span class="feature__icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" focusable="false"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg></span>
+              <h3>Fast and free</h3>
+              <p>No queues, no watermarks and no page limits. Files are processed instantly in memory and downloaded straight back to you.</p>
+            </li>
+          </ul>
+        </section>
+
+        <section class="landing-section" aria-labelledby="faqTitle">
+          <h2 id="faqTitle" class="section-title">Frequently asked questions</h2>
+          <ul class="faq">
+            <li>
+              <details>
+                <summary>Are my files uploaded anywhere? <svg class="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6"/></svg></summary>
+                <div><p>No. Every tool runs entirely in your browser using JavaScript. Your PDFs are read from your device, processed in memory and downloaded back to you. There is no server, no account and no analytics.</p></div>
+              </details>
+            </li>
+            <li>
+              <details>
+                <summary>Is there a file size limit? <svg class="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6"/></svg></summary>
+                <div><p>There is no fixed limit. The only constraint is your browser’s available memory, so very large files work best on a desktop browser.</p></div>
+              </details>
+            </li>
+            <li>
+              <details>
+                <summary>Does merging or editing reduce quality? <svg class="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6"/></svg></summary>
+                <div><p>No. Pages are copied object-for-object and text or images are embedded natively into the original PDF. Nothing is rasterised or recompressed.</p></div>
+              </details>
+            </li>
+            <li>
+              <details>
+                <summary>Which fonts can I use in the editor? <svg class="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6"/></svg></summary>
+                <div><p>Helvetica, Times and Courier work fully offline. You can also pick from more than 1,900 Google Fonts; the font file is only fetched from Google when you choose one, and it is embedded into your PDF.</p></div>
+              </details>
+            </li>
+            <li>
+              <details>
+                <summary>Can I open a password-protected PDF? <svg class="icon icon-sm" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6"/></svg></summary>
+                <div><p>Not yet. Remove the password first, for example by printing the file to a new PDF, then merge or edit the unprotected copy.</p></div>
+              </details>
+            </li>
+          </ul>
+        </section>
+      </div>
+    </div>
   </main>
 
-  <footer class="site-footer">
-    <p>Files are processed locally on your device — nothing is uploaded.</p>
-    <p class="footer-credit">Built by <a href="https://farhan.app" target="_blank" rel="noopener">Farhan</a></p>
+  <footer class="app-footer">
+    <button type="button" class="app-footer__link" data-dialog-open="aboutDialog">About</button>
+    <span class="footer-sep" aria-hidden="true"></span>
+    <a href="/changelog/">Changelog</a>
+    <span class="footer-sep" aria-hidden="true"></span>
+    <button type="button" class="app-footer__link" data-dialog-open="privacyDialog">Privacy</button>
+    <span class="footer-spacer"></span>
+    <span class="footer-meta">Runs locally · nothing uploaded</span>
+    <span class="footer-sep" aria-hidden="true"></span>
+    <span class="footer-credit">Built by <a href="https://farhan.app" rel="noopener">Farhan</a></span>
   </footer>
+
+  <nav class="mobile-nav" aria-label="Primary">
+    <ul>
+      <li>
+        <a class="mobile-nav-item" href="/" aria-current="page">
+          <span class="mobile-nav-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" focusable="false"><path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></span>
+          Home
+        </a>
+      </li>
+      <li>
+        <a class="mobile-nav-item" href="/merge/">
+          <span class="mobile-nav-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" focusable="false"><path d="m8 6 4-4 4 4"/><path d="M12 2v10.3a4 4 0 0 1-1.172 2.872L4 22"/><path d="m20 22-5-5"/></svg></span>
+          Merge
+        </a>
+      </li>
+      <li>
+        <a class="mobile-nav-item" href="/edit/">
+          <span class="mobile-nav-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" focusable="false"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg></span>
+          Edit
+        </a>
+      </li>
+      <li>
+        <button type="button" class="mobile-nav-item" data-theme-toggle aria-label="Switch to dark theme">
+          <span class="mobile-nav-icon" aria-hidden="true">
+            <svg class="icon theme-icon-light" viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+            <svg class="icon theme-icon-dark" viewBox="0 0 24 24" focusable="false"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+          </span>
+          Theme
+        </button>
+      </li>
+    </ul>
+  </nav>
+
+  <dialog class="modal" id="aboutDialog" aria-labelledby="aboutTitle">
+    <div class="modal__inner">
+      <div class="modal__header">
+        <h2 id="aboutTitle" class="modal__title">About PDF Tools</h2>
+        <button type="button" class="btn btn-ghost btn-icon btn-sm" data-dialog-close aria-label="Close dialog">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="modal__body">
+        <p>PDF Tools is a small set of free, browser-based utilities for everyday PDF jobs: merging files and adding text or a signature to a page.</p>
+        <p class="modal__muted">Everything runs client-side with <a href="https://pdf-lib.js.org/" rel="noopener">pdf-lib</a> and <a href="https://mozilla.github.io/pdf.js/" rel="noopener">pdf.js</a>. There is no backend, no database and no account.</p>
+        <ul class="modal__links">
+          <li>Built by <a href="https://farhan.app" rel="noopener">Farhan</a></li>
+          <li>Design benchmarked against <a href="https://app-blueprint.farhan.app/" rel="noopener">App Blueprint</a></li>
+        </ul>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog class="modal" id="privacyDialog" aria-labelledby="privacyTitle">
+    <div class="modal__inner">
+      <div class="modal__header">
+        <h2 id="privacyTitle" class="modal__title">Privacy</h2>
+        <button type="button" class="btn btn-ghost btn-icon btn-sm" data-dialog-close aria-label="Close dialog">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="modal__body">
+        <p>Your files are processed entirely on your device and are never uploaded. This site sets no cookies and uses no analytics.</p>
+        <p class="modal__muted">The only optional network request is to Google Fonts, and only when you pick a Google font in the editor. Your theme preference is stored in your browser’s local storage.</p>
+      </div>
+    </div>
+  </dialog>
+
+  <script src="/assets/common.js" defer></script>
 </body>
 </html>

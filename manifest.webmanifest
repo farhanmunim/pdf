@@ -1,0 +1,16 @@
+{
+  "name": "PDF Tools",
+  "short_name": "PDF Tools",
+  "description": "Free, private, browser-based PDF tools. Merge PDFs and add text or a signature without uploading anything.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "lang": "en",
+  "icons": [
+    { "src": "/assets/icon.svg", "sizes": "any", "type": "image/svg+xml" },
+    { "src": "/assets/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/assets/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
