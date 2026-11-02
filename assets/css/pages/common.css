@@ -1,0 +1,19 @@
+/* ============================================================================
+   6. PAGES
+   ============================================================================ */
+
+/* ── Shared headings ───────────────────────────────────── */
+.eyebrow {
+  font-size: var(--fs-xs); font-weight: 500; color: var(--text-2);
+  letter-spacing: 0.04em; text-transform: uppercase;
+}
+.page-header { display: flex; flex-direction: column; gap: var(--sp-3); margin-bottom: var(--sp-8); }
+.page-title { font-size: 28px; font-weight: 600; letter-spacing: -0.03em; line-height: 1.15; }
+.page-sub { font-size: var(--fs-lg); color: var(--text-2); line-height: 1.6; max-width: 560px; }
+.section-title {
+  font-size: 10.5px; font-weight: 600; color: var(--text-2); letter-spacing: 0.06em; text-transform: uppercase;
+  margin-bottom: var(--sp-4);
+}
+
+/* Used by the merger and the 404 page. */
+.action-row { display: flex; flex-wrap: wrap; gap: var(--sp-3); }

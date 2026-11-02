@@ -1,0 +1,83 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ============================================================================
+   3. BASE
+   ============================================================================ */
+html, body { height: 100%; }
+body {
+  font-family: var(--font-sans);
+  font-size: var(--fs-md);
+  line-height: var(--lh);
+  background: var(--bg);
+  color: var(--text-1);
+  height: 100vh;
+  height: 100svh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.005em;
+  overscroll-behavior: none;
+  -webkit-text-size-adjust: 100%;
+}
+
+button, input, select, textarea { font-family: inherit; font-size: inherit; color: inherit; }
+[hidden] { display: none !important; }
+img, svg, canvas { display: block; max-width: 100%; }
+a { color: inherit; }
+strong { font-weight: 600; }
+code {
+  font-family: var(--font-mono); font-size: 0.88em;
+  background: var(--muted-bg); border: 1px solid var(--border-c);
+  border-radius: var(--r-sm); padding: 1px 6px; color: var(--text-1);
+}
+::selection { background: hsl(var(--info) / 0.2); }
+
+.icon {
+  width: 16px; height: 16px;
+  stroke: currentColor; fill: none;
+  stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  flex-shrink: 0;
+}
+.icon-sm { width: 14px; height: 14px; }
+.icon-xs { width: 12px; height: 12px; }
+.icon-lg { width: 20px; height: 20px; }
+
+/* Focus: ring for everything, shadcn-style double ring for buttons. */
+:focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: 2px; }
+.btn:focus-visible, .input:focus-visible, .mobile-nav-item:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px hsl(var(--ring) / 0.7);
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  top: -100px; left: var(--sp-5);
+  z-index: 300;
+  height: var(--h-btn);
+  display: inline-flex; align-items: center;
+  padding: 0 var(--sp-5);
+  background: hsl(var(--primary)); color: hsl(var(--primary-foreground));
+  border-radius: var(--r-md);
+  font-weight: 500; text-decoration: none;
+  box-shadow: var(--shadow-md);
+}
+.skip-link:focus { top: var(--sp-4); }
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: var(--r-pill); border: 2px solid var(--surface); }
+::-webkit-scrollbar-thumb:hover { background: var(--text-3); }

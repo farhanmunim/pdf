@@ -1,0 +1,79 @@
+/* ============================================================================
+   7. RESPONSIVE, MOTION, POINTER
+   ============================================================================ */
+@media (max-width: 900px) {
+  .canvas-area { padding: 20px; padding-left: calc(20px + env(safe-area-inset-left, 0px)); padding-right: calc(20px + env(safe-area-inset-right, 0px)); }
+  .feature-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+  .mobile-nav { display: flex; }
+  .topbar-nav, .topbar-divider { display: none; }
+  .topbar { padding: 0 var(--sp-4); gap: var(--sp-2); }
+  .version-pill { display: none; }
+
+  .app-footer {
+    flex-wrap: wrap;
+    min-height: 40px;
+    padding: var(--sp-3) var(--sp-4);
+    row-gap: var(--sp-2);
+    order: 2;
+  }
+  .mobile-nav { order: 1; }
+  .footer-spacer { display: none; }
+
+  .canvas-area { padding: 14px; }
+  .canvas-body { padding: var(--sp-6); }
+  .canvas-section { padding: var(--sp-6); }
+  .hero { padding: var(--sp-6) 0 var(--sp-8); }
+  .hero .page-title { font-size: 30px; letter-spacing: -0.03em; }
+  .hero .page-sub { font-size: var(--fs-lg); }
+  .page-title { font-size: 24px; }
+  .tool-grid { grid-template-columns: 1fr; gap: var(--sp-5); }
+  .tool-card, .feature { padding: var(--sp-7); }
+  .dropzone { padding: 28px var(--sp-5); }
+  .editor-toolbar { padding: var(--sp-3) var(--sp-4); }
+  .editor-stage { padding: var(--sp-5) var(--sp-3) 80px; }
+  .file-item__index { display: none; }
+
+  .changelog-area { padding: 32px 18px 56px; }
+  .cl-title { font-size: 30px; letter-spacing: -0.03em; }
+  .cl-entry-title { font-size: 20px; }
+  .cl-entry { padding-bottom: 40px; margin-bottom: 40px; }
+  .cl-header { margin-bottom: 40px; }
+  .cl-sub, .cl-body-text, .cl-list { font-size: var(--fs-md); }
+}
+
+@media (max-width: 380px) {
+  .topbar-logo span { display: none; }
+  .canvas-area { padding: var(--sp-3); }
+  .cl-title { font-size: 26px; }
+}
+
+/* Larger hit areas on touch devices (WCAG 2.5.8). */
+@media (pointer: coarse) {
+  .btn { min-height: 40px; }
+  .btn-sm { min-height: 36px; }
+  .btn-icon { min-width: 40px; }
+  .btn-icon.btn-sm { min-width: 36px; }
+  .input, .editor-toolbar .input { min-height: 36px; }
+  .editor-toolbar input[type="color"].input { min-width: 36px; }
+  .drag-handle { width: 36px; height: 36px; }
+  .fb-results button { height: 40px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .spinner { animation: none; border-right-color: currentColor; opacity: 0.6; }
+}
+
+@media print {
+  .topbar, .app-footer, .mobile-nav, .skip-link, .editor-toolbar { display: none !important; }
+  body { height: auto; overflow: visible; }
+  .canvas-area { overflow: visible; background: none; padding: 0; }
+}

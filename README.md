@@ -31,8 +31,9 @@ navigation bar at ≤640px. Light and dark themes are driven by
 `data-theme` on `<html>` (set before paint by an inline script, persisted in
 `localStorage` under `app-theme`) and fall back to `prefers-color-scheme`.
 
-`assets/style.css` is organised as THEME → TOKENS → BASE → PRIMITIVES →
-SHELL → PAGES → RESPONSIVE. To re-skin, edit the tokens at the top of `:root`.
+The CSS in `assets/css/` is organised as THEME → TOKENS → BASE → PRIMITIVES →
+SHELL → PAGES → RESPONSIVE (one file or folder per layer). To re-skin, edit the
+tokens in `assets/css/tokens.css`.
 
 The Geist and Geist Mono typefaces (OFL) are **self-hosted** under
 `assets/fonts/` (latin + latin-ext subsets) so page loads make no
@@ -53,28 +54,53 @@ third-party requests.
 
 ## Stack
 
-Plain HTML/CSS/JS — no framework, no build step. The PDF libraries are
+Plain HTML/CSS/JS (native ES modules) — no framework, no build step. The PDF libraries are
 vendored under `assets/vendor/` (versioned filenames, immutable caching).
 
 ```
-index.html            Landing page (hero, tools, features, FAQ)
-merge/index.html      Merger UI
-edit/index.html       Editor UI
-changelog/index.html  Release notes
-assets/style.css      Design system + page styles (light/dark)
-assets/common.js      Shared helpers + app shell (theme, dialogs, toolbar keys, announcer, icons)
-assets/merge.js       Merger logic
-assets/edit.js        Editor logic
-assets/google-fonts.json  Baked catalog of Google Font families + variants
-assets/fonts/         Self-hosted Geist / Geist Mono (woff2)
-assets/icon.svg       Favicon / manifest icon (+ icon-192/512.png, apple-touch-icon.png)
-assets/og-*.png       Social preview images (1200×630)
-assets/vendor/        pdf-lib + pdf.js + fontkit (vendored)
-manifest.webmanifest  Web app manifest
-_headers              Cloudflare Pages headers (security + caching)
+index.html                 Landing page (hero, tools, features, FAQ)
+merge/index.html           Merger UI
+edit/index.html            Editor UI
+changelog/index.html       Release notes
+404.html                   Not-found page
+assets/css/                Design system, split in cascade order
+  fonts.css                Self-hosted Geist @font-face
+  tokens.css               THEME + TOKENS (colours, spacing, radii, type, shadows)
+  base.css                 Reset, body, icons, focus, utilities
+  primitives.css           Buttons, chips, inputs
+  shell.css                Topbar, canvas, footer, mobile nav, dialogs
+  pages/common.css         Shared headings, action row
+  pages/landing.css | tool.css | merge.css | editor.css | changelog.css
+  responsive.css           Breakpoints, motion, pointer, print (always last)
+assets/js/                 Native ES modules (no bundler, no build)
+  shell.js                 App shell entry (every page): theme, dialogs, toolbar keys
+  shell/                   theme.js, dialogs.js, toolbars.js
+  shared/                  files.js, status.js (+ announcer), icons.js, pdf-errors.js
+  merge.js                 Merger logic
+  edit/                    Editor (entry: main.js)
+    constants.js dom.js state.js util.js
+    pages.js               Load PDF, page layout, lazy rendering, resize
+    placement.js           Click-to-place mode
+    boxes.js               Text boxes: select, drag, keyboard, inline edit
+    images.js              Signature/image upload, boxes, resize handle
+    toolbar.js             Toolbar controls
+    fonts.js               Google Fonts catalog, variants, font fetching
+    font-browser.js        Google Fonts search panel
+    export.js              Embed text/images into the PDF with pdf-lib
+assets/data/google-fonts.json   Baked catalog of Google Font families + variants
+assets/fonts/              Self-hosted Geist / Geist Mono (woff2)
+assets/icon.svg            Favicon / manifest icon (+ icon-192/512.png, apple-touch-icon.png)
+assets/og-*.png            Social preview images (1200×630)
+assets/vendor/             pdf-lib + pdf.js + fontkit (vendored classic scripts)
+manifest.webmanifest       Web app manifest
+_headers                   Cloudflare Pages headers (security + caching)
 ```
 
-To refresh the Google Fonts catalog, regenerate `assets/google-fonts.json`
+Each page links only the stylesheets it needs, in the order above, with
+`responsive.css` last. The only inline script is the tiny theme initialiser in
+each `<head>` — it must run before first paint to avoid a theme flash.
+
+To refresh the Google Fonts catalog, regenerate `assets/data/google-fonts.json`
 from https://gwfh.mranftl.com/api/fonts: keep families with a `regular`
 variant as `[family, flags]` where flags = 1 for `700`, 2 for `italic`,
 4 for `700italic` (OR'd together).
@@ -82,20 +108,22 @@ variant as `[family, flags]` where flags = 1 for `700`, 2 for `italic`,
 ## Adding a new tool
 
 Create `newtool/index.html` (copy an existing tool page for the shell, SEO
-tags and dialogs), add `assets/newtool.js`, reuse the helpers in
-`assets/common.js`, and add the tool to the landing page grid, topbar nav,
+tags and dialogs), add `assets/js/newtool.js` (a `<script type="module">`, plus `shell.js`), reuse
+the helpers in `assets/js/shared/`, and add the tool to the landing page grid, topbar nav,
 mobile nav, `sitemap.xml` and the changelog. No other changes needed.
 
 ## Releasing
 
 Bump the version pill in each page's topbar **and the `?v=` query on the
-`style.css` / `common.js` / tool script references** (so browsers never pair
-new HTML with a cached old stylesheet or script), add an entry to
+stylesheet and entry-script references** (`assets/css/*.css`, `shell.js`, the
+tool entry script — so browsers never pair new HTML with a cached old
+stylesheet or script; modules they import are always revalidated by
+`_headers`), add an entry to
 `changelog/index.html` and update `lastmod` in `sitemap.xml`.
 
 ## Development
 
-Any static file server works:
+Any static file server works (ES modules need `http://`, not `file://`):
 
 ```sh
 python3 -m http.server 8000

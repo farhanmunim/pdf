@@ -1,0 +1,147 @@
+/* ============================================================================
+   pdf.farhan.app · Design System
+   ----------------------------------------------------------------------------
+   Benchmarked against App Blueprint (app-blueprint.farhan.app). Organised as:
+     1. THEME        → brand tokens (HSL triplets so opacity works)   tokens.css
+     2. TOKENS       → derived colours, spacing, radii, type, shadows  tokens.css
+     3. BASE         → reset, body, icons, focus, utilities            base.css
+        (fonts → fonts.css)
+     4. PRIMITIVES   → buttons, chips, inputs                          primitives.css
+     5. SHELL        → topbar, canvas area, footer, mobile nav, dialogs shell.css
+     6. PAGES        → landing, merge, editor, changelog               pages/*.css
+     7. RESPONSIVE   → tablet & mobile breakpoints, motion, pointer    responsive.css
+   Pages load these files in this order (cascade order matters).
+   ============================================================================ */
+
+/* ============================================================================
+   1–2. THEME + TOKENS (shadcn neutral palette, light)
+   ============================================================================ */
+:root {
+  color-scheme: light;
+
+  --primary:                240 5.9% 10%;
+  --primary-foreground:     0 0% 98%;
+  --accent:                 240 4.8% 95.9%;
+  --accent-foreground:      240 5.9% 10%;
+  --info:                   217 91% 50%;
+
+  --font-sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --background:             0 0% 100%;
+  --foreground:             240 10% 3.9%;
+  --card:                   0 0% 100%;
+  --muted:                  240 4.8% 95.9%;
+  --muted-foreground:       240 3.8% 46.1%;
+  --destructive:            0 72% 51%;
+  --border:                 240 5.9% 90%;
+  --input:                  240 5.9% 90%;
+  --ring:                   240 5% 64.9%;
+
+  --success:                142 65% 30%;
+  --success-bg:             142 60% 94%;
+  --warning:                32 85% 32%;
+  --warning-bg:             38 88% 93%;
+  --info-bg:                214 95% 95%;
+
+  --bg:        hsl(var(--background));
+  --surface:   hsl(var(--card));
+  --muted-bg:  hsl(var(--muted));
+  --border-c:  hsl(var(--border));
+  --border-2:  hsl(240 5.9% 84%);
+  --text-1:    hsl(var(--foreground));
+  --text-2:    hsl(var(--muted-foreground));
+  --text-3:    hsl(240 4% 64%);
+  --text-on-muted: hsl(240 3.8% 40%);
+  --accent-lt: hsl(var(--accent));
+  --overlay:   hsl(240 10% 3.9% / 0.45);
+
+  --green-bg: hsl(var(--success-bg)); --green-bd: hsl(142 55% 78%); --green-tx: hsl(var(--success));
+  --amber-bg: hsl(var(--warning-bg)); --amber-bd: hsl(35 85% 72%);  --amber-tx: hsl(var(--warning));
+  --red-bg:   hsl(0 88% 95%);         --red-bd:   hsl(0 78% 82%);   --red-tx:   hsl(0 72% 42%);
+  --blue-bg:  hsl(var(--info-bg));    --blue-bd:  hsl(214 90% 80%); --blue-tx:  hsl(217 91% 45%);
+
+  --canvas-bg:  hsl(240 5% 97%);
+  --canvas-dot: hsl(240 5% 88%);
+
+  --topbar-h:     52px;
+  --mobile-nav-h: 68px;
+
+  --sp-1: 4px; --sp-2: 6px; --sp-3: 8px; --sp-4: 10px;
+  --sp-5: 12px; --sp-6: 16px; --sp-7: 20px; --sp-8: 24px; --sp-9: 32px;
+
+  --radius: 0.5rem;
+  --r-xs: calc(var(--radius) - 6px);
+  --r-sm: calc(var(--radius) - 4px);
+  --r-md: calc(var(--radius) - 2px);
+  --r-lg: var(--radius);
+  --r-xl: calc(var(--radius) + 4px);
+  --r-pill: 999px;
+
+  --h-btn: 32px; --h-btn-sm: 28px; --h-input: 32px; --h-chip: 20px;
+
+  --fs-xs: 11px; --fs-sm: 12px; --fs-md: 13px; --fs-lg: 14px; --fs-xl: 15px;
+  --lh: 1.5;
+
+  --shadow-sm: 0 1px 2px 0 hsl(240 10% 3.9% / 0.05);
+  --shadow:    0 1px 3px 0 hsl(240 10% 3.9% / 0.08), 0 1px 2px -1px hsl(240 10% 3.9% / 0.06);
+  --shadow-md: 0 4px 6px -1px hsl(240 10% 3.9% / 0.08), 0 2px 4px -2px hsl(240 10% 3.9% / 0.05);
+  --shadow-lg: 0 10px 15px -3px hsl(240 10% 3.9% / 0.08), 0 4px 6px -4px hsl(240 10% 3.9% / 0.05);
+
+  --t-panel: 220ms cubic-bezier(.4, 0, .2, 1);
+  --t-fast:  150ms cubic-bezier(.4, 0, .2, 1);
+}
+
+/* Dark theme. Applied explicitly via data-theme="dark" (set before paint by
+   the inline script in <head>), and implicitly from the OS preference when
+   no theme has been chosen or JavaScript is unavailable. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --background: 240 10% 3.9%; --foreground: 0 0% 98%; --card: 240 10% 3.9%;
+    --primary: 0 0% 98%; --primary-foreground: 240 5.9% 10%;
+    --muted: 240 3.7% 15.9%; --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%; --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%; --border: 240 3.7% 15.9%; --input: 240 3.7% 15.9%; --ring: 240 4.9% 83.9%;
+    --success: 142 65% 58%; --success-bg: 142 55% 13%;
+    --warning: 38 95% 62%; --warning-bg: 35 70% 13%;
+    --info: 217 92% 62%; --info-bg: 217 70% 14%;
+    --border-2: hsl(240 3.7% 25%); --text-3: hsl(240 5% 55%); --text-on-muted: hsl(240 5% 70%); --overlay: hsl(0 0% 0% / 0.6);
+    --green-bd: hsl(142 40% 26%); --amber-bd: hsl(35 55% 26%); --red-bd: hsl(0 55% 30%); --blue-bd: hsl(217 55% 30%);
+    --red-bg: hsl(0 60% 13%); --red-tx: hsl(0 85% 72%); --blue-tx: hsl(217 92% 70%);
+    --canvas-bg: hsl(240 6% 7%); --canvas-dot: hsl(240 5% 18%);
+    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.3);
+    --shadow:    0 1px 3px 0 hsl(0 0% 0% / 0.4), 0 1px 2px -1px hsl(0 0% 0% / 0.3);
+    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.4), 0 2px 4px -2px hsl(0 0% 0% / 0.3);
+    --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.5), 0 4px 6px -4px hsl(0 0% 0% / 0.4);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --background: 240 10% 3.9%; --foreground: 0 0% 98%; --card: 240 10% 3.9%;
+  --primary: 0 0% 98%; --primary-foreground: 240 5.9% 10%;
+  --muted: 240 3.7% 15.9%; --muted-foreground: 240 5% 64.9%;
+  --accent: 240 3.7% 15.9%; --accent-foreground: 0 0% 98%;
+  --destructive: 0 62.8% 30.6%; --border: 240 3.7% 15.9%; --input: 240 3.7% 15.9%; --ring: 240 4.9% 83.9%;
+  --success: 142 65% 58%; --success-bg: 142 55% 13%;
+  --warning: 38 95% 62%; --warning-bg: 35 70% 13%;
+  --info: 217 92% 62%; --info-bg: 217 70% 14%;
+  --border-2: hsl(240 3.7% 25%); --text-3: hsl(240 5% 55%); --text-on-muted: hsl(240 5% 70%); --overlay: hsl(0 0% 0% / 0.6);
+  --green-bd: hsl(142 40% 26%); --amber-bd: hsl(35 55% 26%); --red-bd: hsl(0 55% 30%); --blue-bd: hsl(217 55% 30%);
+  --red-bg: hsl(0 60% 13%); --red-tx: hsl(0 85% 72%); --blue-tx: hsl(217 92% 70%);
+  --canvas-bg: hsl(240 6% 7%); --canvas-dot: hsl(240 5% 18%);
+  --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.3);
+  --shadow:    0 1px 3px 0 hsl(0 0% 0% / 0.4), 0 1px 2px -1px hsl(0 0% 0% / 0.3);
+  --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.4), 0 2px 4px -2px hsl(0 0% 0% / 0.3);
+  --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.5), 0 4px 6px -4px hsl(0 0% 0% / 0.4);
+}
+
+/* Theme toggle icon: show the icon of the theme you would switch TO. */
+.theme-icon-light { display: none; }
+.theme-icon-dark  { display: block; }
+:root[data-theme="dark"] .theme-icon-light { display: block; }
+:root[data-theme="dark"] .theme-icon-dark  { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .theme-icon-light { display: block; }
+  :root:not([data-theme="light"]) .theme-icon-dark  { display: none; }
+}

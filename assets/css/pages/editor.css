@@ -1,0 +1,110 @@
+/* ── Editor ────────────────────────────────────────────── */
+.editor { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+.editor-toolbar {
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-6);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border-c);
+  flex-shrink: 0;
+  z-index: 40;
+}
+.tb-group { display: flex; align-items: center; gap: var(--sp-1); }
+.tb-sep { width: 1px; height: 20px; background: var(--border-c); margin: 0 var(--sp-1); flex-shrink: 0; }
+.tb-spacer { flex: 1; }
+.editor-toolbar .input { height: var(--h-btn-sm); font-size: var(--fs-sm); }
+.editor-toolbar select.input { max-width: 180px; }
+.editor-toolbar input[type="color"].input { width: var(--h-btn-sm); }
+
+.editor-body { position: relative; flex: 1; display: flex; flex-direction: column; min-height: 0; }
+
+.font-browser {
+  position: absolute; top: var(--sp-3); left: 50%; transform: translateX(-50%);
+  z-index: 60;
+  width: min(480px, calc(100% - 24px));
+  background: var(--surface);
+  border: 1px solid var(--border-c);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-lg);
+  padding: var(--sp-3);
+}
+.font-browser[hidden] { display: none; }
+.fb-head { display: flex; gap: var(--sp-2); align-items: center; }
+.fb-head .input { flex: 1; min-width: 0; }
+.fb-results { list-style: none; max-height: 40dvh; overflow-y: auto; margin-top: var(--sp-3); display: flex; flex-direction: column; gap: 1px; }
+.fb-results button {
+  display: block; width: 100%; text-align: left;
+  font-size: var(--fs-md); font-weight: 500;
+  height: 32px; padding: 0 var(--sp-4);
+  border: 0; border-radius: var(--r-md);
+  background: none; color: var(--text-1); cursor: pointer;
+  transition: background var(--t-fast);
+}
+.fb-results button:hover, .fb-results button:focus-visible { background: var(--muted-bg); }
+.fb-note { color: var(--text-2); font-size: var(--fs-sm); padding: var(--sp-3) var(--sp-4); }
+
+.editor-stage { padding: var(--sp-7) var(--sp-6) 96px; }
+.editor-stage.placing .page-overlay { cursor: crosshair; }
+.editor-hint {
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+  text-align: center;
+  margin: 0 auto var(--sp-6);
+  max-width: 640px;
+  justify-content: center;
+}
+.editor-hint .kbd { margin: 0 2px; }
+.editor-stage .status-line { margin: 0 auto var(--sp-6); }
+
+.pdf-page {
+  position: relative;
+  margin: 0 auto 28px;
+  background: #fff;
+  border: 1px solid var(--border-c);
+  box-shadow: var(--shadow-md);
+  border-radius: var(--r-xs);
+}
+.pdf-page canvas { width: 100%; height: 100%; }
+.page-label {
+  position: absolute; top: 100%; left: 0; right: 0;
+  text-align: center;
+  color: var(--text-2);
+  font-family: var(--font-mono); font-size: var(--fs-xs);
+  padding-top: var(--sp-1);
+}
+.page-overlay { position: absolute; inset: 0; }
+
+.tbox {
+  position: absolute;
+  line-height: 1.2;
+  white-space: pre;
+  min-width: 0.5em; min-height: 1em;
+  outline: none;
+  cursor: grab;
+  touch-action: none;
+  border: 1px dashed transparent;
+  user-select: none; -webkit-user-select: none;
+  border-radius: 1px;
+}
+.tbox.selected { border-color: hsl(var(--info)); }
+.tbox:focus-visible { outline: 2px solid hsl(var(--info)); outline-offset: 2px; }
+.tbox.editing { cursor: text; touch-action: auto; user-select: text; -webkit-user-select: text; border-style: solid; }
+
+.ibox {
+  position: absolute;
+  cursor: grab; touch-action: none;
+  user-select: none; -webkit-user-select: none;
+  border: 1px dashed transparent; outline: none;
+}
+.ibox img { width: 100%; height: 100%; pointer-events: none; }
+.ibox.selected { border-color: hsl(var(--info)); }
+.ibox:focus-visible { outline: 2px solid hsl(var(--info)); outline-offset: 2px; }
+.ibox .resize-handle {
+  position: absolute; right: -14px; bottom: -14px;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: hsl(var(--info)); border: 2px solid #fff;
+  cursor: nwse-resize; touch-action: none;
+  display: none;
+  box-shadow: var(--shadow-md);
+}
+.ibox.selected .resize-handle { display: block; }
